@@ -61,7 +61,7 @@ class OwnerdashboardController extends Controller
             
         $dueDate->apartment = $apartment;
         return $dueDate;
-    })
+        })
     ->filter(function($dueDate) {
         return $dueDate->apartment !== null;
     });
@@ -120,7 +120,7 @@ class OwnerdashboardController extends Controller
       $buildingBOccupied = $buildingB ? $buildingB->occupied_count : 0;
       $buildingBVacant = $buildingB ? ($buildingB->apartments_count - $buildingB->occupied_count) : 0;
     // Pass data to the view
-    return view('dashboard', compact(
+    return view('owner.dashboard', compact(
             'totalRooms',
             'occupiedRooms',
             'expiringLease',
