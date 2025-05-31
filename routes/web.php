@@ -83,10 +83,11 @@ Route::group(['middleware' => ['auth','verified']], function () {
             return view('/admin/logs');
         })->name('admin.logs.index');
     });
-    
+    Route::get('/owner/dashboard', [OwnerDashboardController::class, 'index'])
+    ->name('owner.dashboard');
     //route group for owner pages
     Route::group(['middleware' => ['isOwner']], function () {
-        Route::get('/owner/dashboard', [OwnerDashboardController::class, 'index'])->name('owner.dashboard');
+        // Route::get('/owner/dashboard', [OwnerDashboardController::class, 'index'])->name('owner.dashboard');
         Route::controller(ImageController::class)->group(function() {
             Route::get('/owner/categories/{categoryId}/upload', 'index')->name('images.index');
             Route::get('/owner/categories/{categoryId}/edit', 'edit');
