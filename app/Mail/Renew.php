@@ -29,7 +29,7 @@ class Contract extends Mailable
      */
     public function build()
     {
-        return $this->from('hardyaranzanso07@gmail.com')
+        return $this->from('nrnabode@gmail.com')
                     ->subject('Updated Contract')
                     ->view('emails.renew') // This is the HTML view
                     ->with('data', $this->data) // Make sure 'data' is passed here

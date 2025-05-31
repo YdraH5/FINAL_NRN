@@ -22,6 +22,6 @@ class NotifyMe extends Mailable
     }
 
    public function build(){
-    return $this->from('hardyaranzanso07@gmail.com')->subject('Notify me')->view('emails.notify')->with('data',$this->data);
+    return $this->from('nrnabode@gmail.com')->subject('Notify me')->view('emails.notify')->with('data',$this->data);
    }
 }

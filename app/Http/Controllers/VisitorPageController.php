@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\DB;
 
 class VisitorPageController extends Controller
 {
+    public function index()
+    {
+        return view('visitors.index');
+    }
     // For viewing full details
     public function display(Category $apartment)
     {

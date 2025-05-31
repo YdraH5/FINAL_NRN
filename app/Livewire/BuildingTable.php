@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\BUilding;
+use App\Models\Building;
 use Livewire\Attributes\Validate; 
 use Livewire\WithPagination;
 
@@ -70,7 +70,7 @@ class BuildingTable extends Component
     }
     public function render()
     {
-        return view('livewire.owner.building-table',[
+        return view('livewire.owner.apartment-table',[
             'buildings' => Building::all()]);
     }
 }

@@ -22,6 +22,6 @@ class PaymentAccepted extends Mailable
     }
 
    public function build(){
-    return $this->from('hardyaranzanso07@gmail.com')->subject('Payment Accepted')->view('emails.accepted')->with('data',$this->data);
+    return $this->from('nrnabode@gmail.com')->subject('Payment Accepted')->view('emails.accepted')->with('data',$this->data);
    }
 }

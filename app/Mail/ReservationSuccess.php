@@ -22,6 +22,6 @@ class ReservationSuccess extends Mailable
     }
 
    public function build(){
-    return $this->from('hardyaranzanso07@gmail.com')->subject('Reservation Success')->view('emails.success')->with('data',$this->data);
+    return $this->from('nrnabode@gmail.com')->subject('Reservation Success')->view('emails.success')->with('data',$this->data);
    }
 }

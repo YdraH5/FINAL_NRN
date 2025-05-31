@@ -21,7 +21,7 @@
         </div>
 
         <div class="mb-4">
-            <label class="block text-sm font-medium">Neary Description</label>
+            <label class="block text-sm font-medium">Nearby Description</label>
             <textarea wire:model="neary_description" class="w-full p-2 border rounded"></textarea>
             @error('neary_description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>

@@ -27,7 +27,7 @@ class SendOtpMail extends Mailable
      */
     public function build()
     {
-        return $this->from('hardyaranzanso07@gmail.com')
+        return $this->from('nrnabode@gmail.com')
                     ->subject('OTP')
                     ->view('emails.otp')
                     ->with([
