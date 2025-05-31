@@ -70,7 +70,7 @@ class BuildingTable extends Component
     }
     public function render()
     {
-        return view('livewire.owner.apartment-table',[
+        return view('livewire.owner.building-table',[
             'buildings' => Building::all()]);
     }
 }
