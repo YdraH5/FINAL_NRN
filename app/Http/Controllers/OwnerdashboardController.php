@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Spatie\Activitylog\Models\Activity;
 use Livewire\WithPagination;
 use Carbon\Carbon;
-class OwnerDashboardController extends Controller
+class OwnerdashboardController extends Controller
 {   
     public function index()
         {

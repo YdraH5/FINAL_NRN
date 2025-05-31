@@ -7,7 +7,7 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\SubmitReportController;
 use App\Http\Controllers\NotifyMeController;
 use App\Http\Controllers\AdminDashboardController;
-use App\Http\Controllers\OwnerDashboardController;
+use App\Http\Controllers\OwnerdashboardController;
 use App\Http\Controllers\RenterController;
 use Illuminate\Support\Facades\Route;
 
@@ -86,7 +86,7 @@ Route::group(['middleware' => ['auth','verified']], function () {
     
     //route group for owner pages
     Route::group(['middleware' => ['isOwner']], function () {
-        Route::get('/owner/dashboard', [OwnerDashboardController::class, 'index'])->name('owner.dashboard');
+        Route::get('/owner/dashboard', [OwnerdashboardController::class, 'index'])->name('owner.dashboard');
         Route::controller(ImageController::class)->group(function() {
             Route::get('/owner/categories/{categoryId}/upload', 'index')->name('images.index');
             Route::get('/owner/categories/{categoryId}/edit', 'edit');
