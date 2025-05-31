@@ -15,59 +15,60 @@ use Illuminate\Support\Facades\DB;
 use Spatie\Activitylog\Models\Activity;
 use Livewire\WithPagination;
 use Carbon\Carbon;
+
 class AdminDashboardController extends Controller
 
 
 {   
     use WithPagination;
     public function index()
-    {
-      // Room metrics
-      $totalRooms = Appartment::count();
-      $occupiedRooms = Appartment::whereNotNull('renter_id')->count();
-      $vacantRooms = $totalRooms - $occupiedRooms;
-      $occupancyRate = $totalRooms > 0 ? ($occupiedRooms / $totalRooms) * 100 : 0;
-  
-      // Revenue metrics
-      $currentMonthRevenue = Payment::whereMonth('created_at', now()->month)
-          ->whereYear('created_at', now()->year)
-          ->where('status', 'paid')
-          ->sum('amount');
-  
-      $prevMonthRevenue = Payment::whereMonth('created_at', now()->subMonth()->month)
-          ->whereYear('created_at', now()->subMonth()->year)
-          ->where('status', 'paid')
-          ->sum('amount');
-  
-      $revenueChange = $prevMonthRevenue > 0 ? 
-          (($currentMonthRevenue - $prevMonthRevenue) / $prevMonthRevenue) * 100 : 0;
-  
-      // Lease metrics
-      $expiringLeases = Reservation::whereBetween('check_in', [now(), now()->addDays(30)])
-          ->count();
-      // In your AdminDashboardController's index method
-$overdueRenters = DueDate::with(['user', 'payment'])
-->where('payment_due_date', '<', now())
-->where('status', '!=', 'paid')
-->whereHas('user', function($query) {
-    $query->where('role', 'renter');
-})
-->orderBy('payment_due_date')
-->get()
-->map(function($dueDate) {
-    // Get the apartment through the user's reservations
-    $apartment = Reservation::where('user_id', $dueDate->user_id)
-        ->where('status', 'approved')
-        ->with('apartment.building')
-        ->first()
-        ->apartment ?? null;
-        
-    $dueDate->apartment = $apartment;
-    return $dueDate;
-})
-->filter(function($dueDate) {
-    return $dueDate->apartment !== null;
-});
+        {
+        // Room metrics
+        $totalRooms = Appartment::count();
+        $occupiedRooms = Appartment::whereNotNull('renter_id')->count();
+        $vacantRooms = $totalRooms - $occupiedRooms;
+        $occupancyRate = $totalRooms > 0 ? ($occupiedRooms / $totalRooms) * 100 : 0;
+    
+        // Revenue metrics
+        $currentMonthRevenue = Payment::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->where('status', 'paid')
+            ->sum('amount');
+    
+        $prevMonthRevenue = Payment::whereMonth('created_at', now()->subMonth()->month)
+            ->whereYear('created_at', now()->subMonth()->year)
+            ->where('status', 'paid')
+            ->sum('amount');
+    
+        $revenueChange = $prevMonthRevenue > 0 ? 
+            (($currentMonthRevenue - $prevMonthRevenue) / $prevMonthRevenue) * 100 : 0;
+    
+        // Lease metrics
+        $expiringLeases = Reservation::whereBetween('check_in', [now(), now()->addDays(30)])
+            ->count();
+        // In your AdminDashboardController's index method
+    $overdueRenters = DueDate::with(['user', 'payment'])
+    ->where('payment_due_date', '<', now())
+    ->where('status', '!=', 'paid')
+    ->whereHas('user', function($query) {
+        $query->where('role', 'renter');
+    })
+    ->orderBy('payment_due_date')
+    ->get()
+    ->map(function($dueDate) {
+        // Get the apartment through the user's reservations
+        $apartment = Reservation::where('user_id', $dueDate->user_id)
+            ->where('status', 'approved')
+            ->with('apartment.building')
+            ->first()
+            ->apartment ?? null;
+            
+        $dueDate->apartment = $apartment;
+        return $dueDate;
+    })
+    ->filter(function($dueDate) {
+        return $dueDate->apartment !== null;
+    });
       // Maintenance metrics
       $openMaintenance = Report::where('status', 'Pending')->count();
       $inProgressMaintenance = Report::where('status', 'Ongoing')->count();
@@ -124,7 +125,7 @@ $overdueRenters = DueDate::with(['user', 'payment'])
       $buildingBVacant = $buildingB ? ($buildingB->apartments_count - $buildingB->occupied_count) : 0;
     // Pass data to the view
     return view('dashboard', compact(
-        'totalRooms',
+            'totalRooms',
             'occupiedRooms',
             'expiringLease',
             'vacantRooms',

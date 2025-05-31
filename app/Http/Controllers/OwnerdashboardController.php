@@ -120,7 +120,7 @@ class OwnerDashboardController extends Controller
       $buildingBOccupied = $buildingB ? $buildingB->occupied_count : 0;
       $buildingBVacant = $buildingB ? ($buildingB->apartments_count - $buildingB->occupied_count) : 0;
     // Pass data to the view
-    return view('owner.dashboard', compact(
+    return view('dashboard', compact(
             'totalRooms',
             'occupiedRooms',
             'expiringLease',
