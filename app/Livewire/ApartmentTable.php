@@ -107,8 +107,9 @@ class ApartmentTable extends Component
 
         $this->reset();
         $this->isEditing = false;
+
+        return redirect()->route('owner.apartment.index')->with('success', 'Apartment updated successfully.');
         // Reset the component state
-        session()->flash('success', 'Apartment updated successfully.');
     }
     public function close(){
         $this->isEditing = false;
@@ -121,8 +122,8 @@ class ApartmentTable extends Component
     public function deleted(){
         $delete = Appartment::find($this->deleteId)->delete();
         if($delete){
-            session()->flash('success', 'Apartment deleted successfully.');
-            $this->reset();
+            return redirect()->route('owner.apartment.index')->with('success', 'Apartment deleted successfully.');
+
         }
         $this->isDeleting = false;
     }
@@ -224,7 +225,7 @@ class ApartmentTable extends Component
 
             // Reset the form values
             $this->reset();
-            session()->flash('success', 'Adding renter successful.');
+            return redirect()->route('owner.apartment.index')->with('success', 'Adding renter successful.');
 
         } catch (\Exception $e) {
             // Rollback the transaction if something fails

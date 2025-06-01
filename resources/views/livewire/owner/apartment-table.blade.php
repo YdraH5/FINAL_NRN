@@ -122,11 +122,6 @@
     <div class="no-print overflow-x-auto bg-white shadow-lg">
         <table class="min-w-full mx-2 border-collapse">
             <thead> 
-                @if (session('success'))
-                <div class="alert alert-success text-green-700">
-                    {{ session('success') }}
-                </div>    
-                @endif
                 
                 <tr class="bg-indigo-500 text-white uppercase text-sm">
                     <th wire:click="doSort('room_number')" class="py-3 px-4 text-center border-b border-indigo-600 cursor-pointer">
@@ -194,6 +189,7 @@
                         </td>
                         <td class="no-print py-3 px-4 text-center border-b border-gray-300">
                             <div class="flex justify-center gap-1"> 
+                            @if(!$apartments->renter_id)
                             <button
                                 x-data="{ id: {{$apartments->id}} }"
                                 x-on:click="$wire.set('id', id); $dispatch('open-modal', { name: 'edit-apartment' })"
@@ -203,6 +199,7 @@
                                 class="my-2">
                             @include('buttons.edit')
                             </button>
+                            @endif
                             @if($isEditing)
                             <x-modal name="edit-apartment" title="Edit Apartment">
                                 <x-slot:body>
@@ -262,7 +259,7 @@
                                 </x-slot:body>
                             </x-modal>
                              @endif
-                             
+                            @if(!$apartments->renter_id)
                             <button
                                 x-data="{ id: {{$apartments->id}} }"
                                 x-on:click="$wire.set('id', id); $dispatch('open-modal', { name: 'delete-apartment' })"
@@ -272,6 +269,7 @@
                                 class="my-2">
                                 @include('buttons.delete')
                             </button>
+                            @endif
                             @if($isDeleting)
                             <x-modal name="delete-apartment" title="Delete Apartment">
                                 <x-slot name="body">

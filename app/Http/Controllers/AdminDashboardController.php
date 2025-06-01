@@ -95,6 +95,7 @@ class AdminDashboardController extends Controller
           ->where('status', 'paid')
           ->groupBy(DB::raw('MONTH(created_at)'))
           ->pluck('total', 'month');
+          
   
       $months = collect(range(1, 12))->mapWithKeys(function ($month) use ($monthlyRevenue) {
           return [$month => $monthlyRevenue->get($month, 0)];

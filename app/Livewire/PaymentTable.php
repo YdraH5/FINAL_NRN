@@ -55,17 +55,17 @@ class PaymentTable extends Component
     public function approve($payment_id)
     {
         $payment = Payment::find($payment_id);
-    
+
         if (!$payment) {
             return redirect()->back()->with('error', 'Payment record not found.');
         }
-    
+
         $user = User::find($payment->user_id);
-    
+
         if (!$user) {
             return redirect()->back()->with('error', 'User associated with this payment not found.');
         }
-    
+
         if ($payment->category === 'Rent Fee') {
             $this->updatePaymentAndDueDate($payment_id, 'paid');
             $this->sendPaymentAcceptedEmail($user, $payment);
@@ -86,8 +86,12 @@ class PaymentTable extends Component
             
             $this->sendPaymentAcceptedEmail($user, $payment);
         }
-    
+        
+        // Close the modal after processing
+        $this->dispatch('close-modal', name: 'view-receipt');
+        
         session()->flash('success', 'Payment Approved');
+        return redirect()->route('admin.payments.index');
     }
     private function updatePaymentAndDueDate($payment_id, $status)
     {

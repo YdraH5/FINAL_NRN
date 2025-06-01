@@ -38,7 +38,9 @@
                 <select class="w-full text-gray-700 text-center" wire:model="roomNumber">
                     <option value="" disabled {{ count($rooms) > 1 ? 'selected' : '' }}>Select Room</option>
                     @foreach ($rooms as $room)
-                        <option value="{{ $room->id }}">{{ $room->room_number }}</option>
+                        <option value="{{ $room->id }}">
+                            {{ $room->building_name }}-
+                            {{ $room->room_number }}</option>
                     @endforeach
                 </select>
                 @error('roomNumber') <span class="error text-red-900 text-xs">{{ $message }}</span> @enderror 

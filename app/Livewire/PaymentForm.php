@@ -101,7 +101,7 @@ class PaymentForm extends Component
         'user_id' => $this->selectedUserId, // Use selectedUserId here
         'status' => 'paid',
         'payment_method' => 'cash',
-        'category' => 'Lease',
+        'category' => 'Rent Fee',
         'amount' => $this->amount,
     ]);
     $due_pay = DueDate::where('id', $this->duedate_id)

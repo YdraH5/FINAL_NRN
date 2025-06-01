@@ -12,7 +12,19 @@
             </svg>
         </div>
     </div>
-
+    @if (session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '{{ session('success') }}',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            });
+        </script>
+    @endif
     <!-- Table -->
     <div class="overflow-x-auto bg-white  shadow-lg">
         <table class="min-w-full mx-2 border-collapse ">

@@ -56,9 +56,17 @@
 
     <!-- Success Message -->
     @if (session('success'))
-        <div class="alert alert-success text-green-700 mb-4 p-4 bg-green-100 rounded-lg no-print">
-            {{ session('success') }}
-        </div>    
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '{{ session('success') }}',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            });
+        </script>
     @endif
 
     <!-- Table -->

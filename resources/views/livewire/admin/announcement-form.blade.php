@@ -3,7 +3,7 @@
     <x-modal name="add-announcement" title="Add Announcement">
         <x-slot:body>
             <!-- Form -->
-            <form id="announcementForm" class="space-y-4" wire:submit.prevent="save">
+            <form id="announcementForm" class="space-y-2" wire:submit.prevent="save">
                 @if ($errors->any())
                 <div class="alert alert-danger">
                     <ul>
@@ -13,7 +13,7 @@
                     </ul>
                 </div>
                 @endif
-                <div class="lg:grid lg:grid-cols-2 lg:gap-6">
+                <div class="lg:grid lg:grid-cols-2 lg:gap-2">
                     <!-- Category -->
                     <div>
                         <label class="block font-medium opacity-70">Category</label>

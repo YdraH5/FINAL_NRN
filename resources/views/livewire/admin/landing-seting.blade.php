@@ -1,10 +1,18 @@
 <div class="p-6 bg-white shadow-md rounded-lg">
     <h2 class="text-xl font-bold mb-4">Update Landing Page</h2>
 
-    @if (session()->has('message'))
-        <div class="bg-green-200 text-green-800 p-2 rounded mb-4">
-            {{ session('message') }}
-        </div>
+    @if (session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '{{ session('success') }}',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            });
+        </script>
     @endif
         
     <form wire:submit.prevent="updateReport">

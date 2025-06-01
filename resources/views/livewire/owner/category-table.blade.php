@@ -21,9 +21,17 @@
       <table class="min-w-full mx-2 border-collapse">
           <thead> 
             @if (session('success'))
-            <div class="alert alert-success text-green-500">
-                {{ session('success') }}
-            </div>    
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: '{{ session('success') }}',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                    });
+                </script>
             @endif
             <tr class="bg-indigo-500 text-white uppercase text-sm">
               <th class="py-3 px-4 text-center border-b border-indigo-600">Category Name</th>

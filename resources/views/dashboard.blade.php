@@ -126,7 +126,23 @@
                 </div>
             </div>
             
-            <!-- Leases Expiring Soon Table -->
+           
+            <!-- Payment Collection Pie Chart -->
+            <div class="bg-white p-6 pb-6 rounded-lg shadow-xl">
+                <h2 class="text-xl font-bold">Payment Collection Status</h2>
+                <span class="text-sm font-semibold text-gray-500">{{ now()->year }}</span>
+                @php
+                    $paidCount = \App\Models\DueDate::where('status', 'paid')->count();
+                    $pendingCount = \App\Models\DueDate::where('status', 'pending')->count();
+                    $overdueCount = \App\Models\DueDate::where('status', '!=', 'paid')
+                        ->where('payment_due_date', '<', \Carbon\Carbon::today())
+                        ->count();
+                @endphp
+                <div class="w-full h-64">
+                    <canvas id="paymentChart"></canvas>
+                </div>
+            </div>
+             <!-- Leases Expiring Soon Table -->
             <div class="bg-white p-6 rounded-lg shadow-xl mt-6 mx-4">
               <h2 class="text-xl font-bold mb-4">Leases Expiring Soon (Next 30 Days)</h2>
               
@@ -182,22 +198,72 @@
                   <p class="text-gray-500">No leases are expiring in the next 30 days.</p>
               @endif
             </div>
-            <!-- Payment Collection Pie Chart -->
-            <div class="bg-white p-6 pb-6 rounded-lg shadow-xl">
-                <h2 class="text-xl font-bold">Payment Collection Status</h2>
-                <span class="text-sm font-semibold text-gray-500">{{ now()->year }}</span>
-                @php
-                    $paidCount = \App\Models\DueDate::where('status', 'paid')->count();
-                    $pendingCount = \App\Models\DueDate::where('status', 'pending')->count();
-                    $overdueCount = \App\Models\DueDate::where('status', '!=', 'paid')
-                        ->where('payment_due_date', '<', \Carbon\Carbon::today())
-                        ->count();
-                @endphp
-                <div class="w-full h-64">
-                    <canvas id="paymentChart"></canvas>
-                </div>
-            </div>
             
+            
+            <!-- Overdue Payments Table -->
+            <div class="bg-white p-6 rounded-lg shadow-xl mt-6 mx-4">
+                <h2 class="text-xl font-bold mb-4">Overdue Payments</h2>
+                
+                @if($overdueRenters->count() > 0)
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tenant</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Building</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount Due</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days Overdue</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach($overdueRenters as $dueDate)
+                                    @php
+                                        $daysOverdue = now()->diffInDays($dueDate->payment_due_date);
+                                    @endphp
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    {{ $dueDate->user->name }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">
+                                                {{ $dueDate->apartment->room_number ?? 'N/A' }}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">
+                                                {{ $dueDate->apartment->building->name ?? 'N/A' }}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">
+                                                {{ \Carbon\Carbon::parse($dueDate->payment_due_date)->format('M d, Y') }}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">
+                                                ₱{{ number_format($dueDate->amount_due, 2) }}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                {{ $daysOverdue }} days
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <p class="text-gray-500">No overdue payments found.</p>
+                @endif
+            </div>
             <!-- Complaint Status Pie Chart -->
             <div class="bg-white p-6 pb-6 rounded-lg shadow-xl">
                 <h2 class="text-xl font-bold">Complaint Status</h2>
@@ -211,70 +277,6 @@
                     <canvas id="complaintChart"></canvas>
                 </div>
             </div>
-            <!-- Overdue Payments Table -->
-<div class="bg-white p-6 rounded-lg shadow-xl mt-6 mx-4">
-    <h2 class="text-xl font-bold mb-4">Overdue Payments</h2>
-    
-    @if($overdueRenters->count() > 0)
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tenant</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Building</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount Due</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days Overdue</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach($overdueRenters as $dueDate)
-                        @php
-                            $daysOverdue = now()->diffInDays($dueDate->payment_due_date);
-                        @endphp
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="text-sm font-medium text-gray-900">
-                                        {{ $dueDate->user->name }}
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    {{ $dueDate->apartment->room_number ?? 'N/A' }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    {{ $dueDate->apartment->building->name ?? 'N/A' }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    {{ \Carbon\Carbon::parse($dueDate->payment_due_date)->format('M d, Y') }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    ₱{{ number_format($dueDate->amount_due, 2) }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                    {{ $daysOverdue }} days
-                                </span>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    @else
-        <p class="text-gray-500">No overdue payments found.</p>
-    @endif
-</div>
             {{-- <!-- Chart Container -->
         <div class="bg-white p-6 rounded-lg shadow-xl my-4">
           <h2 class="text-xl font-bold mb-4">Building Occupancy</h2>

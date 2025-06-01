@@ -24,13 +24,19 @@
     <div class="overflow-x-auto bg-white  shadow-lg">
         <table class="min-w-full mx-2 border-collapse ">
             <thead>
-                    @if (session('success'))
-                    <tr>
-                        <td colspan="8" class="text-center bg-green-200 text-green-700 py-2">
-                            {{ session('success') }}
-                        </td>
-                    </tr>
-                    @endif
+                @if (session('success'))
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: '{{ session('success') }}',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        });
+                    </script>
+                @endif
                 <tr class="bg-indigo-500 text-white uppercase text-sm">
                     <th wire:click="doSort('name')" class="py-3 px-4 text-center border-b border-indigo-600 cursor-pointer">
                         <div class="inline-flex items-center justify-center">

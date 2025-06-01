@@ -52,6 +52,7 @@ class BuildingTable extends Component
         $this->reset();
         // Reset the component state
         session()->flash('success', 'Building updated successfully.');
+        return redirect()->route('owner.apartment.index')->with('success', 'Building updated successfully.');
     }
     // function to get the id of the data that user wanted to delete
     public function delete($id){

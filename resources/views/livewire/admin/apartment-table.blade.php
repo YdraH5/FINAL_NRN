@@ -56,11 +56,19 @@
         <div class="print-only overflow-x-auto bg-white shadow-lg">
             <table class="min-w-full mx-2 border-collapse">
                 <thead> 
-                    @if (session('success'))
-                    <div class="alert alert-success text-green-700">
-                        {{ session('success') }}
-                    </div>    
-                    @endif
+                @if (session('success'))
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: '{{ session('success') }}',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        });
+                    </script>
+                @endif
                     
                     <tr class="bg-indigo-500 text-white uppercase text-sm">
                         <th wire:click="doSort('room_number')" class="py-3 px-4 text-center border-b border-indigo-600 cursor-pointer">

@@ -53,7 +53,19 @@
             <p class="text-gray-600 text-sm">Position: {{ auth()->user()->role }}</p>
         </div>
     </div>
-
+    @if (session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '{{ session('success') }}',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            });
+        </script>
+    @endif
     <!-- Table Section -->
     <div class="print-only overflow-x-auto bg-white shadow-lg">
         <table class="min-w-full mx-2 border-collapse">

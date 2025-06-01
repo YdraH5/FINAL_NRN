@@ -15,6 +15,7 @@ class ViewDetail extends Component
     public $showDropdown = false;
     public $categoryId;
     public $available;
+    public $building;
     public $room_available;
     public $floorNumber = 'any';  // Default value 'any' for displaying all rooms
     public $roomNumber;  // Stores the selected room number
@@ -92,10 +93,17 @@ class ViewDetail extends Component
     public function loadAvailableRooms()
     {
         $query = DB::table('apartment')
-            ->select('apartment.id', 'apartment.room_number', 'apartment.status')
+            ->join('buildings', 'apartment.building_id', '=', 'buildings.id')
+            ->select(
+                'apartment.id',
+                'apartment.room_number',
+                'apartment.building_id',
+                'apartment.status',
+                'buildings.name as building_name' // Added building name
+            )
             ->where('apartment.category_id', $this->categoryId)
             ->where('apartment.status', 'Available');
-
+       
         if ($this->floorNumber !== 'any') {
             // Determine the room number range based on the selected floor
             $floorStart = intval($this->floorNumber) * 100;

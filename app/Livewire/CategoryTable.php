@@ -60,43 +60,45 @@ class CategoryTable extends Component
     }
     public function update()
     {
-    $this->validate([
-        'name' => 'required|max:50|unique:categories,name,' . $this->id,
-        'price' => 'required|numeric',
-    ]);
-
-    $descriptionJson = json_encode($this->features);
-
-    $category = Category::find($this->id);
-    if ($category) {
-        // Check if the price has changed
-        $oldPrice = $category->price;
-        $newPrice = $this->price;
-
-        // Update the category
-        $category->update([
-            'name' => $this->name,
-            'price' => $newPrice,
-            'description' => $descriptionJson,
+        $this->validate([
+            'name' => 'required|max:50|unique:categories,name,' . $this->id,
+            'price' => 'required|numeric',
         ]);
 
-        // Update due dates for all future months
-        $nextMonthStart = now()->addMonth()->startOfMonth();
+        $descriptionJson = json_encode($this->features);
 
-        DB::table('due_dates')
-            ->join('apartment', 'due_dates.user_id', '=', 'apartment.renter_id')
-            ->where('apartment.category_id', $this->id)
-            ->where('due_dates.payment_due_date', '>=', $nextMonthStart)
-            ->update(['due_dates.amount_due' => $newPrice]);
+        $category = Category::find($this->id);
+        if ($category) {
+            // Check if the price has changed
+            $oldPrice = $category->price;
+            $newPrice = $this->price;
 
-        // Notify users if the price has changed
-        if ($oldPrice != $newPrice) {
-            $this->notifyUsersOfPriceChange($this->id, $newPrice);
+            // Update the category
+            $category->update([
+                'name' => $this->name,
+                'price' => $newPrice,
+                'description' => $descriptionJson,
+            ]);
+
+            // Update due dates for all future months
+            $nextMonthStart = now()->addMonth()->startOfMonth();
+
+            DB::table('due_dates')
+                ->join('apartment', 'due_dates.user_id', '=', 'apartment.renter_id')
+                ->where('apartment.category_id', $this->id)
+                ->where('due_dates.payment_due_date', '>=', $nextMonthStart)
+                ->update(['due_dates.amount_due' => $newPrice]);
+
+            // Notify users if the price has changed
+            if ($oldPrice != $newPrice) {
+                $this->notifyUsersOfPriceChange($this->id, $newPrice);
+            }
         }
-    }
 
-    $this->reset();
-    session()->flash('success', 'Category updated successfully.');
+        $this->reset();
+        session()->flash('success', 'Category updated successfully.');
+        return redirect()->route('owner.categories.index')->with('success','Category updated successfully.');
+
 }
 
 public function notifyUsersOfPriceChange($categoryId, $newPrice)
@@ -132,8 +134,8 @@ public function notifyUsersOfPriceChange($categoryId, $newPrice)
     public function deleted(){
         $delete = Category::find($this->deleteId)->delete();
         if($delete){
-            session()->flash('success', 'Category deleted successfully.');
             $this->reset();
+            return redirect()->route('owner.categories.index')->with('success','Category deleted successfully.');
         }
         $this->isDeleting=false;
     }

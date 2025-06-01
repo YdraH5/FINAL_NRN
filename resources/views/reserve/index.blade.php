@@ -86,7 +86,8 @@
                         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" :disabled="!agreed">
                             Confirm Reservation
                         </button>
-                        <a class="text-blue-500 hover:text-blue-800 font-bold text-sm" href="{{ route('visitors.display', ['apartment' => $data->id]) }}">
+                        
+                        <a class="text-blue-500 hover:text-blue-800 font-bold text-sm" href="{{ route('welcome') }}">
                             Cancel
                         </a>
                     </div>

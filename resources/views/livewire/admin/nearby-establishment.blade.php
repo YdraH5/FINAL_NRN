@@ -19,11 +19,19 @@
     <!-- Table -->
     <div class="overflow-x-auto bg-white shadow-lg">
         <table class="min-w-full mx-2 border-collapse">
-                <!-- Success Message -->
+            <!-- Success Message -->
             @if (session('success'))
-                <div class="alert alert-success text-green-700 mb-4 p-4 bg-green-100 rounded-lg">
-                    {{ session('success') }}
-                </div>    
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: '{{ session('success') }}',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                    });
+                </script>
             @endif
             <thead>
                 <tr class="bg-indigo-500 text-white uppercase text-sm">

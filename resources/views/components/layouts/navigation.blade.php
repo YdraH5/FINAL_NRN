@@ -1,5 +1,5 @@
 
-<div class="no-print fixed w-full z-30 flex bg-[#343a40] p-2 items-center justify-center h-20 px-10">
+<div class="no-print fixed w-full z-30 flex bg-[#212529] p-2 items-center justify-center h-20 px-10">
   
   <div class="no-print flex">
     <button type="button" id="sidebarCollapse" class="no-print text-white p-2 rounded focus:outline-none">
@@ -9,7 +9,7 @@
     </button>
     <!-- Sidebar -->
     <nav id="sidebar" class="no-print text-white w-64 min-h-screen fixed bg-[#212529] overflow-y-auto">
-      <div class="no-print p-2 bg-[#343a40] px-4 sticky top-0">
+      <div class="no-print p-2 bg-[#212529] px-4 sticky top-0">
         <img src="{{ asset('images/NRN LOGO.png') }}" style="height: 64px; width:128px" class="no-print sm:mx-4 lg:mx-6 lg:h-20 lg:w-60">
       </div>
       <div id="mobileLogo" class="no-print hidden fixed top-0 left-0 my-2 bg-[#212529]">

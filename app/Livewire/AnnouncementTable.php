@@ -18,8 +18,7 @@ class AnnouncementTable extends Component
     public function deleted(){
         $delete = Announcement::find($this->deleteId)->delete();
         if($delete){
-            session()->flash('success', 'Announcement deleted successfully.');
-            $this->reset();
+            return redirect()->route('admin.announcement.index')->with('success', 'Announcement deleted successfully.');
         }
         $this->isDeleting = false;
     }
@@ -60,7 +59,7 @@ class AnnouncementTable extends Component
         $this->isEditing = false;
         $this->reset();
         // Reset the component state
-        session()->flash('success', 'Announcement updated successfully.');
+        return redirect()->route('admin.announcement.index')->with('success', 'Announcement updated successfully.');  
     }
 
     public function render()
