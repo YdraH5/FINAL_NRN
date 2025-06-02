@@ -35,7 +35,7 @@
                             </div>
                         </div>
                         
-                        <!-- Contract Modal -->
+                        {{-- <!-- Contract Modal -->
                         <div id="contractContainer" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
                             <div class="bg-white rounded-lg shadow-xl relative max-w-5xl w-full">
                                 <div class="p-4 border-b flex justify-between items-center">
@@ -60,7 +60,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                             View Contract
-                        </button>
+                        </button> --}}
                     </div>
                     
                     @if (session('success'))
@@ -222,44 +222,7 @@
                         </div>
                     </div>
                     
-                    @if($announcements->count() > 0)
-                        <div class="space-y-4">
-                            @foreach($announcements as $announcement)
-                                <div class="bg-white rounded-lg border @if($announcement->priority == 'High') border-red-200 bg-red-50 @elseif($announcement->priority == 'Medium') border-yellow-200 bg-yellow-50 @else border-blue-200 bg-blue-50 @endif overflow-hidden shadow-sm">
-                                    <div class="p-5">
-                                        <div class="flex justify-between items-start">
-                                            <div>
-                                                <h4 class="text-lg font-semibold text-gray-800 mb-1">
-                                                    {{ $announcement->title }}
-                                                </h4>
-                                                <p class="text-gray-600 mb-2">{{ $announcement->content }}</p>
-                                            </div>
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                                @if($announcement->priority == 'High') bg-red-100 text-red-800
-                                                @elseif($announcement->priority == 'Medium') bg-yellow-100 text-yellow-800
-                                                @else bg-blue-100 text-blue-800 @endif">
-                                                {{ $announcement->priority }}
-                                            </span>
-                                        </div>
-                                        <div class="flex items-center text-sm text-gray-500 mt-3">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                            Posted on {{ \Carbon\Carbon::parse($announcement->start_date)->format('M d, Y') }}
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="text-center py-8">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <h4 class="mt-2 text-lg font-medium text-gray-700">No announcements</h4>
-                            <p class="mt-1 text-gray-500">There are no announcements at this time.</p>
-                        </div>
-                    @endif
+                    @livewire('announcement-posted') 
                 </div>
             </div>
 

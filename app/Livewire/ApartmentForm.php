@@ -36,6 +36,7 @@ class ApartmentForm extends Component
         // Count the current number of apartments for the selected building
         $currentCount = DB::table('apartment')
             ->where('building_id', $this->building_id)
+            ->whereNull('apartment.deleted_at')
             ->count();
        
         // Add validation with custom rule for max units check

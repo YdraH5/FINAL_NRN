@@ -2,12 +2,12 @@
 
 @section('content')
 <x-owner-layout>
-  <div class="py-6">
+ <div class="py-6">
     <div class="min-w-full mx-auto">
       <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
         <div class="flex flex-col">
           <div class="flex items-center gap-4 mb-4 p-2 bg-gray-50 rounded-lg shadow-sm">
-            <h1 class="text-2xl font-semibold text-black">Admin Dashboard</h1>
+            <h1 class="text-2xl font-semibold text-black">owner Dashboard</h1>
           </div>
 
           <section class="text-gray-700 body-font">
@@ -15,18 +15,18 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 gap-2 text-center">  <!-- Reduced gap from gap-4 to gap-2 -->
                     @foreach([
                         [
-                            'route' => '/admin/users',
+                            'route' => '/owner/users',
                             'icon' => 'user',
                             'count' => \App\Models\User::where('role', 'renter')->count(),
                             'label' => 'Occupants',
                             'color' => 'text-indigo-500'
                         ],
-                        ['route' => 'admin/reports', 'icon' => 'report', 'count' => \App\Models\Report::count(), 'label' => 'Reports', 'color' => 'text-red-500'],
-                        ['route' => 'admin/apartment', 'icon' => 'room', 'count' => $vacantRooms, 'label' => 'Vacant Room', 'color' => 'text-green-500'],
-                        ['route' => 'admin/reservations', 'icon' => 'reservation', 'count' => \App\Models\Reservation::whereNotNull('user_id')->whereDate('check_in', '>', now())->count(), 'label' => 'Reservations', 'color' => 'text-indigo-500'],
+                        ['route' => '/owner/reports', 'icon' => 'report', 'count' => \App\Models\Report::count(), 'label' => 'Complaints', 'color' => 'text-red-500'],
+                        ['route' => '/owner/apartment', 'icon' => 'room', 'count' => $vacantRooms, 'label' => 'Vacant Room', 'color' => 'text-green-500'],
+                        ['route' => '/owner/reservations', 'icon' => 'reservation', 'count' => \App\Models\Reservation::whereNotNull('user_id')->whereDate('check_in', '>', now())->count(), 'label' => 'Reservations', 'color' => 'text-indigo-500'],
                         // Occupancy Rate Card
                         [
-                            'route' => '#',
+                            'route' => '/owner/apartment',
                             'icon' => 'room',
                             'count' => number_format($occupancyRate, 1) . '%',
                             'label' => 'Occupancy Rate',
@@ -35,7 +35,7 @@
                         ],
                         // Current Month Revenue Card
                         [
-                            'route' => '#',
+                            'route' => '/owner/payments',
                             'icon' => 'payment',
                             'count' => '₱' . number_format($currentMonthRevenue),
                             'label' => "This Month's Revenue",
@@ -46,7 +46,7 @@
                         ],
                         // Expiring Leases Card
                         [
-                            'route' => '#',
+                            'route' => '/owner/occupants',
                             'icon' => 'reservation',
                             'count' => $expiringLeases,
                             'label' => 'Leases Expiring Soon',
@@ -107,25 +107,55 @@
           
           <!-- Charts Section -->
           <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 px-4">
-            <!-- Monthly Revenue Chart -->
-            <div class="bg-white p-6 pb-6 rounded-lg shadow-xl">
-                <h2 class="text-xl font-bold">Monthly Revenue</h2>
-                <span class="text-sm font-semibold text-gray-500">{{ now()->year }}</span>
-                <div class="flex items-end flex-grow w-full mt-2 space-x-2 sm:space-x-3">
-                    @php
-                        $maxRevenue = $months->isNotEmpty() ? max($months->toArray()) : 1;
-                        $maxHeight = 40;
-                    @endphp
-                    @foreach($months as $month => $revenue)
-                        <div class="relative flex flex-col items-center flex-grow pb-5 group">
-                            <span class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block">₱{{ number_format($revenue) }}</span>
-                            <div class="relative flex justify-center w-full h-{{ $maxRevenue > 0 ? round(($revenue / $maxRevenue) * $maxHeight) : 0 }} bg-indigo-400"></div>
-                            <span class="absolute bottom-0 text-xs font-bold">{{ Carbon\Carbon::create()->month($month)->format('M') }}</span>
-                        </div>
-                    @endforeach
+            
+            <!-- Revenue Comparison Chart -->
+            <div class="bg-white p-6 rounded-lg shadow-xl mt-6 mx-4 col-span-2">
+                <h2 class="text-xl font-bold mb-4">Revenue Comparison</h2>
+                <div class="flex space-x-4 mb-4">
+                    <button onclick="showChart('weekly')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                        Weekly
+                    </button>
+                    <button onclick="showChart('monthly')" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
+                        Monthly
+                    </button>
+                    <button onclick="showChart('yearly')" class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50">
+                        Yearly
+                    </button>
+                </div>
+                <div class="w-full h-96">
+                    <canvas id="revenueComparisonChart"></canvas>
                 </div>
             </div>
-            <!-- Leases Expiring Soon Table -->
+           
+            <!-- Payment Collection Pie Chart -->
+            <div class="bg-white p-6 pb-6 rounded-lg shadow-xl">
+                <h2 class="text-xl font-bold">Payment Collection Status</h2>
+                <span class="text-sm font-semibold text-gray-500">{{ now()->year }}</span>
+                @php
+                    $paidCount = \App\Models\DueDate::where('status', 'paid')->count();
+                    $pendingCount = \App\Models\DueDate::where('status', 'pending')->count();
+                    $overdueCount = \App\Models\DueDate::where('status', '!=', 'paid')
+                        ->where('payment_due_date', '<', \Carbon\Carbon::today())
+                        ->count();
+                @endphp
+                <div class="w-full h-64">
+                    <canvas id="paymentChart"></canvas>
+                </div>
+            </div>
+                        <!-- Complaint Status Pie Chart -->
+            <div class="bg-white p-6 pb-6 rounded-lg shadow-xl">
+                <h2 class="text-xl font-bold">Complaint Status</h2>
+                <span class="text-sm font-semibold text-gray-500">{{ now()->year }}</span>
+                @php
+                    $openComplaints = \App\Models\Report::where('status', 'Pending')->count();
+                    $inProgressComplaints = \App\Models\Report::where('status', 'Ongoing')->count();
+                    $resolvedComplaints = \App\Models\Report::where('status', 'Fixed')->count();
+                @endphp
+                <div class="w-full h-64">
+                    <canvas id="complaintChart"></canvas>
+                </div>
+            </div>
+             <!-- Leases Expiring Soon Table -->
             <div class="bg-white p-6 rounded-lg shadow-xl mt-6 mx-4">
               <h2 class="text-xl font-bold mb-4">Leases Expiring Soon (Next 30 Days)</h2>
               
@@ -181,35 +211,73 @@
                   <p class="text-gray-500">No leases are expiring in the next 30 days.</p>
               @endif
             </div>
-            <!-- Payment Collection Pie Chart -->
-            <div class="bg-white p-6 pb-6 rounded-lg shadow-xl">
-                <h2 class="text-xl font-bold">Payment Collection Status</h2>
-                <span class="text-sm font-semibold text-gray-500">{{ now()->year }}</span>
-                @php
-                    $paidCount = \App\Models\DueDate::where('status', 'paid')->count();
-                    $pendingCount = \App\Models\DueDate::where('status', 'pending')->count();
-                    $overdueCount = \App\Models\DueDate::where('status', '!=', 'paid')
-                        ->where('payment_due_date', '<', \Carbon\Carbon::today())
-                        ->count();
-                @endphp
-                <div class="w-full h-64">
-                    <canvas id="paymentChart"></canvas>
-                </div>
-            </div>
             
-            <!-- Complaint Status Pie Chart -->
-            <div class="bg-white p-6 pb-6 rounded-lg shadow-xl">
-                <h2 class="text-xl font-bold">Complaint Status</h2>
-                <span class="text-sm font-semibold text-gray-500">{{ now()->year }}</span>
-                @php
-                    $openComplaints = \App\Models\Report::where('status', 'Pending')->count();
-                    $inProgressComplaints = \App\Models\Report::where('status', 'Ongoing')->count();
-                    $resolvedComplaints = \App\Models\Report::where('status', 'Fixed')->count();
-                @endphp
-                <div class="w-full h-64">
-                    <canvas id="complaintChart"></canvas>
-                </div>
+            
+            <!-- Overdue Payments Table -->
+            <div class="bg-white p-6 rounded-lg shadow-xl mt-6 mx-4">
+                <h2 class="text-xl font-bold mb-4">Overdue Payments</h2>
+                
+                @if($overdueRenters->count() > 0)
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tenant</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Building</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount Due</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days Overdue</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach($overdueRenters as $dueDate)
+                                    @php
+                                        $daysOverdue = now()->diffInDays($dueDate->payment_due_date);
+                                    @endphp
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    {{ $dueDate->user->name }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">
+                                                {{ $dueDate->apartment->room_number ?? 'N/A' }}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">
+                                                {{ $dueDate->apartment->building->name ?? 'N/A' }}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">
+                                                {{ \Carbon\Carbon::parse($dueDate->payment_due_date)->format('M d, Y') }}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">
+                                                ₱{{ number_format($dueDate->amount_due, 2) }}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                {{ $daysOverdue }} days
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <p class="text-gray-500">No overdue payments found.</p>
+                @endif
             </div>
+
             {{-- <!-- Chart Container -->
         <div class="bg-white p-6 rounded-lg shadow-xl my-4">
           <h2 class="text-xl font-bold mb-4">Building Occupancy</h2>
@@ -223,30 +291,6 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
           document.addEventListener("DOMContentLoaded", function () {
-              // // Building Occupancy Chart
-              // const buildingCtx = document.getElementById('buildingOccupancyChart').getContext('2d');
-              // new Chart(buildingCtx, {
-              //     type: 'bar',
-              //     data: {
-              //         labels: ['Building A', 'Building B'],
-              //         datasets: [{
-              //             label: 'Occupied',
-              //             data: [@json($buildingAOccupied), @json($buildingBOccupied)],
-              //             backgroundColor: '#4F46E5',
-              //         }, {
-              //             label: 'Vacant',
-              //             data: [@json($buildingAVacant), @json($buildingBVacant)],
-              //             backgroundColor: '#E5E7EB',
-              //         }]
-              //     },
-              //     options: {
-              //         responsive: true,
-              //         scales: {
-              //             x: { stacked: true },
-              //             y: { stacked: true }
-              //         }
-              //     }
-              // });
           
               // Payment Collection Chart
               const paymentCtx = document.getElementById('paymentChart').getContext('2d');
@@ -286,6 +330,84 @@
                   options: { responsive: true, maintainAspectRatio: false }
               });
           });
+          // Revenue Comparison Chart
+const revenueCtx = document.getElementById('revenueComparisonChart').getContext('2d');
+let revenueChart;
+
+function initRevenueChart(type) {
+    let labels, data, label, backgroundColor;
+    
+    switch(type) {
+        case 'weekly':
+            labels = @json($weeklyRevenue->pluck('week'));
+            data = @json($weeklyRevenue->pluck('total'));
+            label = 'Weekly Revenue';
+            backgroundColor = 'rgba(54, 162, 235, 0.5)';
+            break;
+        case 'monthly':
+            labels = @json($monthlyRevenue->pluck('month')).map(month => new Date(0, month - 1).toLocaleString('default', { month: 'long' }));
+            data = @json($monthlyRevenue->pluck('total'));
+            label = 'Monthly Revenue';
+            backgroundColor = 'rgba(75, 192, 192, 0.5)';
+            break;
+        case 'yearly':
+            labels = @json($yearlyRevenue->pluck('year'));
+            data = @json($yearlyRevenue->pluck('total'));
+            label = 'Yearly Revenue';
+            backgroundColor = 'rgba(153, 102, 255, 0.5)';
+            break;
+    }
+
+    if (revenueChart) {
+        revenueChart.destroy();
+    }
+
+    revenueChart = new Chart(revenueCtx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: label,
+                data: data,
+                backgroundColor: backgroundColor,
+                borderColor: backgroundColor.replace('0.5', '1'),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '₱' + value.toLocaleString();
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return '₱' + context.raw.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function showChart(type) {
+    initRevenueChart(type);
+}
+
+// Initialize with weekly data by default
+document.addEventListener("DOMContentLoaded", function() {
+    initRevenueChart('weekly');
+});
           </script>
 
         

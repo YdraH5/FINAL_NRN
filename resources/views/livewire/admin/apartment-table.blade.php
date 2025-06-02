@@ -120,11 +120,6 @@
     <div class="no-print overflow-x-auto bg-white shadow-lg">
         <table class="min-w-full mx-2 border-collapse">
             <thead> 
-                @if (session('success'))
-                <div class="alert alert-success text-green-700">
-                    {{ session('success') }}
-                </div>    
-                @endif
                 
                 <tr class="bg-indigo-500 text-white uppercase text-sm">
                     <th wire:click="doSort('room_number')" class="py-3 px-4 text-center border-b border-indigo-600 cursor-pointer">
@@ -179,7 +174,17 @@
                             {{$apartments->renters_name}}
                     @endif
                         </td>
-                        <td class="py-3 px-4 text-center border-b border-gray-300">{{$apartments->status}}</td>
+                        <td class="py-3 px-4 text-center border-b border-gray-300">
+                            <span class="@if($apartments->status == 'Rented') text-green-600
+                                        @elseif($apartments->status == 'Under Review') text-yellow-600
+                                        @elseif($apartments->status == 'Available') text-blue-600
+                                        @elseif($apartments->status == 'Unavailable') text-red-600
+                                        @elseif($apartments->status == 'Reserved') text-purple-600
+                                        @else text-gray-600 @endif">
+                                {{ $apartments->status }}
+                            </span>
+                        </td>
+
                         <td class="py-3 px-4 text-center border-b border-gray-300">
                         @php
                         $occupants = App\Models\Reservation::where('user_id', $apartments->renter_id)

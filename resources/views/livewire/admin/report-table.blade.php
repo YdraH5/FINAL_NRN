@@ -85,27 +85,38 @@
                     <td class="py-3 px-4 text-center border-b border-gray-300">
                         <x-modal name="solve-report" title="Solve Report">
                             <x-slot:body>
-                                <form id="modalForm" class="space-y-4 "wire:submit.prevent="action">
+                                <form id="modalForm" class="space-y-6" wire:submit.prevent="action">
+                                    <!-- Status Select -->
                                     <div>
-                                        <input type="hidden"wire:model="status">
-                                        <div>
-                                            <label class="block font-medium opacity-70">Status</label>
-                                            <select wire:model="status" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
-                                                <option value="" disabled selected hidden>Status</option>
-                                                <option value="Pending">Pending</option>
-                                                <option value="Ongoing">Ongoing</option>
-                                                <option value="Fixed">Fixed</option>
-                                            </select>
-                                            @error('status') <span class="error text-red-900">{{ $message }}</span> @enderror
-                                        </div> 
+                                        <label class="block text-gray-700 font-medium mb-2">Status</label>
+                                        <select wire:model="status"
+                                                class="text-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-full h-11 px-3 text-sm border border-gray-300 rounded-lg">
+                                            <option value="" disabled selected hidden>Select Status</option>
+                                            <option value="Pending">Pending</option>
+                                            <option value="Ongoing">Ongoing</option>
+                                            <option value="Fixed">Fixed</option>
+                                        </select>
+                                        @error('status')
+                                            <span class="text-sm text-red-600 mt-1 block">{{ $message }}</span>
+                                        @enderror
                                     </div>
-                                    <div class="flex items-center justify-between py-8">
-                                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button>
-                                        <button  x-on:click="$dispatch('close-modal',{name:'add-apartment'})" type="button" class="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">Close</button>
+
+                                    <!-- Action Buttons -->
+                                    <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                                        <button type="button"
+                                                x-on:click="$dispatch('close-modal', { name: 'solve-report' })"
+                                                class="bg-gray-500 hover:bg-gray-700 text-white font-medium px-4 py-2 rounded-lg transition duration-150">
+                                            Cancel
+                                        </button>
+                                        <button type="submit"
+                                                class="bg-blue-600 hover:bg-blue-800 text-white font-medium px-5 py-2 rounded-lg transition duration-150">
+                                            Submit
+                                        </button>
                                     </div>
                                 </form>
                             </x-slot:body>
                         </x-modal>
+
                         <div class="btn-group flex justify-center">
                             <button
                             x-data="{ id: {{$report->id}} }"

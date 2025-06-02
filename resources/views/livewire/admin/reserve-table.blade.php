@@ -18,34 +18,52 @@
 
     <!-- Print-Only Section -->
     <div class="print-only bg-white p-6 rounded-lg shadow-md mb-6">
-        <!-- Logo and Title -->
-        <div class="flex items-center justify-between mb-4">
-            <img src="{{ asset('images/NRN LOGO.png') }}" class="h-16">
-            <div class="text-center">
-                <h1 class="text-2xl font-bold text-gray-800">Reservation Management Report</h1>
-                <p class="text-gray-600 text-sm">Generated on: {{ date('F d, Y') }}</p>
-            </div>
+    <!-- Logo and Title -->
+    <div class="flex items-center justify-between mb-4">
+        <img src="{{ asset('images/NRN LOGO.png') }}" class="h-16">
+        <div class="text-center">
+            <h1 class="text-2xl font-bold text-gray-800">Monthly Reservation Report</h1>
+            <p class="text-gray-600 text-sm">For: {{ date('F Y') }}</p>
+            <p class="text-gray-600 text-sm">Generated on: {{ date('F d, Y') }}</p>
         </div>
+    </div>
 
-        <h2 class="text-xl font-semibold mb-6 text-indigo-600">Reservation Summary</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div class="bg-blue-100 p-6 rounded-lg shadow-md">
-                <h3 class="text-lg font-medium text-blue-600">Total Reservations</h3>
-                <p class="text-4xl font-bold">{{ $totalReservations }}</p>
-            </div>
-            <div class="bg-green-100 p-6 rounded-lg shadow-md">
-                <h3 class="text-lg font-medium text-green-600">Approved</h3>
-                <p class="text-4xl font-bold">{{ $approvedCount }}</p>
-            </div>
-            <div class="bg-yellow-100 p-6 rounded-lg shadow-md">
-                <h3 class="text-lg font-medium text-yellow-600">Pending</h3>
-                <p class="text-4xl font-bold">{{ $pendingCount }}</p>
-            </div>
-            <div class="bg-red-100 p-6 rounded-lg shadow-md">
-                <h3 class="text-lg font-medium text-red-600">Rejected</h3>
-                <p class="text-4xl font-bold">{{ $rejectedCount }}</p>
-            </div>
+    <h2 class="text-xl font-semibold mb-6 text-indigo-600">Monthly Reservation Summary</h2>
+    
+    @php
+        // Filter reservations for current month
+        $currentMonthReservations = $reservations->filter(function ($reservation) {
+            return \Carbon\Carbon::parse($reservation->check_in)->isCurrentMonth() && 
+                   \Carbon\Carbon::parse($reservation->check_in)->isCurrentYear();
+        });
+        
+        // Calculate monthly counts
+        $monthlyTotal = $currentMonthReservations->count();
+        $monthlyApproved = $currentMonthReservations->where('reservation_status', 'approved')->count();
+        $monthlyPending = $currentMonthReservations->where('reservation_status', 'pending')->count();
+        $monthlyRejected = $currentMonthReservations->where('reservation_status', 'rejected')->count();
+        $monthlyRevenue = $currentMonthReservations->sum('total_price');
+    @endphp
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-blue-100 p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-medium text-blue-600">Total Reservations</h3>
+            <p class="text-4xl font-bold">{{ $monthlyTotal }}</p>
         </div>
+        <div class="bg-green-100 p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-medium text-green-600">Approved</h3>
+            <p class="text-4xl font-bold">{{ $monthlyApproved }}</p>
+        </div>
+        <div class="bg-yellow-100 p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-medium text-yellow-600">Pending</h3>
+            <p class="text-4xl font-bold">{{ $monthlyPending }}</p>
+        </div>
+        <div class="bg-red-100 p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-medium text-red-600">Rejected</h3>
+            <p class="text-4xl font-bold">{{ $monthlyRejected }}</p>
+        </div>
+    </div>
+
 
         <!-- Prepared By Section -->
         <div class="mt-10 border-t pt-4">

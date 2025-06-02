@@ -114,6 +114,28 @@ class AdminDashboardController extends Controller
               $query->whereNotNull('renter_id');
           }
       ])->get();
+      // Get weekly revenue data
+        $weeklyRevenue = Payment::where('status', 'paid')
+            ->selectRaw('WEEK(created_at) as week, SUM(amount) as total')
+            ->whereYear('created_at', now()->year)
+            ->groupBy('week')
+            ->orderBy('week')
+            ->get();
+
+        // Get monthly revenue data
+        $monthlyRevenue = Payment::where('status', 'paid')
+            ->selectRaw('MONTH(created_at) as month, SUM(amount) as total')
+            ->whereYear('created_at', now()->year)
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        // Get yearly revenue data
+        $yearlyRevenue = Payment::where('status', 'paid')
+            ->selectRaw('YEAR(created_at) as year, SUM(amount) as total')
+            ->groupBy('year')
+            ->orderBy('year')
+            ->get();
   
       // Extract specific building data (alternative approach)
       $buildingA = Building::where('name', 'A')->first();
@@ -128,6 +150,9 @@ class AdminDashboardController extends Controller
     return view('dashboard', compact(
             'totalRooms',
             'occupiedRooms',
+            'weeklyRevenue',
+            'monthlyRevenue',
+            'yearlyRevenue',
             'expiringLease',
             'vacantRooms',
             'occupancyRate',

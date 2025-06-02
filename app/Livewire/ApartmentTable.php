@@ -225,7 +225,7 @@ class ApartmentTable extends Component
 
             // Reset the form values
             $this->reset();
-            return redirect()->route('owner.apartment.index')->with('success', 'Adding renter successful.');
+            return redirect()->route('admin.apartment.index')->with('success', 'Adding renter successful.');
 
         } catch (\Exception $e) {
             // Rollback the transaction if something fails
@@ -257,6 +257,7 @@ class ApartmentTable extends Component
             ->join('categories', 'categories.id', '=', 'apartment.category_id')
             ->join('buildings','buildings.id', '=', 'apartment.building_id')
             ->leftJoin('users', 'users.id', '=', 'apartment.renter_id')
+            ->whereNull('apartment.deleted_at') // Add this line to exclude soft-deleted records
             ->orderBy($this->sortColumn, $this->sortDirection);
         // Filter based on the search
         if (!empty($this->search)) {

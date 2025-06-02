@@ -55,7 +55,14 @@ class OccupantsTable extends Component
             ]);
         User::where('id',$apartment->renter_id)
         ->update(['role'=>'departed']);
-        return redirect()->route('admin.occupants.index')->with('success', 'Renter removed to the apartment successfully');
+        if (auth()->user()->role === 'admin') {
+           return redirect()->route('admin.occupants.index')->with('success', 'Renter removed to the apartment successfully');
+        } elseif (auth()->user()->role === 'owner') {
+           return redirect()->route('owner.occupants.index')->with('success', 'Renter removed to the apartment successfully');
+        } else {
+            // Handle if user doesn't have the right role
+            abort(403, 'Unauthorized action.');
+        }
 
     }
     public function send()
@@ -173,8 +180,14 @@ class OccupantsTable extends Component
         // Send the email
         Mail::to($user->email)->send(new SendReminder($emailData));
     
-        return redirect()->route('admin.occupants.index')->with('success', 'Reminder email sent successfully to ' . $user->name);
-
+        if (auth()->user()->role === 'admin') {
+           return redirect()->route('admin.occupants.index')->with('success', 'Reminder email sent successfully to ' . $user->name);
+        } elseif (auth()->user()->role === 'owner') {
+           return redirect()->route('owner.occupants.index')->with('success', 'Reminder email sent successfully to ' . $user->name);
+        } else {
+            // Handle if user doesn't have the right role
+            abort(403, 'Unauthorized action.');
+        }
     }
     
     public function render()

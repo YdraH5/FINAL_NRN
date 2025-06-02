@@ -92,77 +92,114 @@
                             type="button">@include('buttons.edit')
                         </button>
                             @if($isEditing)
-                            <x-modal name="edit-announcement" title="Edit Announcement">
-                                <x-slot:body>
-                                    <!-- Form -->
-                                    <form id="announcementForm" class="space-y-4" wire:submit.prevent="update">
-                                        @if ($errors->any())
-                                        <div class="alert alert-danger">
-                                            <ul>
-                                                @foreach ($errors->all() as $error)
-                                                    <li>{{ $error }}</li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                        @endif
-                                        <div class="lg:grid lg:grid-cols-2 lg:gap-6">
-                                            <!-- Category -->
-                                            <div>
-                                                <label class="block font-medium opacity-70">Category</label>
-                                                <select wire:model="category" class="text-gray-600 focus:outline-none focus:border focus:border-indigo-700 focus:ring-2 focus:ring-indigo-500 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
-                                                    <option value="all">All</option>
-                                                    @foreach ($categories as $category)
-                                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                                @error('category') <span class="error text-red-900">{{ $message }}</span> @enderror
-                                            </div>
-                                            <!-- Title -->
-                                            <div>
-                                                <label class="block font-medium opacity-70">Title</label>
-                                                <input type="text" wire:model="title" placeholder="Announcement Title" class="text-gray-600 focus:outline-none focus:border focus:border-indigo-700 focus:ring-2 focus:ring-indigo-500 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
-                                                @error('title') <span class="error text-red-900">{{ $message }}</span> @enderror
-                                            </div>
-                                            <!-- Content -->
-                                            <div>
-                                                <label class="block font-medium opacity-70">Content</label>
-                                                <textarea wire:model="content" placeholder="Announcement Content" class="text-gray-600 focus:outline-none focus:border focus:border-indigo-700 focus:ring-2 focus:ring-indigo-500 font-normal w-full h-20 flex items-center pl-3 text-sm border-gray-300 rounded border"></textarea>
-                                                @error('content') <span class="error text-red-900">{{ $message }}</span> @enderror
-                                            </div>
-                                            <!-- Priority -->
-                                            <div>
-                                                <label class="block font-medium opacity-70">Priority</label>
-                                                <select wire:model="priority" class="text-gray-600 focus:outline-none focus:border focus:border-indigo-700 focus:ring-2 focus:ring-indigo-500 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
-                                                    <option value="" disabled selected hidden>Select Priority</option>
-                                                    <option value="Low">Minor</option>
-                                                    <option value="High">Urgent</option>
-                                                </select>
-                                                @error('priority') <span class="error text-red-900">{{ $message }}</span> @enderror
-                                            </div>
-                                            <!-- Status -->
-                                            <div>
-                                                <label class="block font-medium opacity-70">Status</label>
-                                                <select wire:model="status" class="text-gray-600 focus:outline-none focus:border focus:border-indigo-700 focus:ring-2 focus:ring-indigo-500 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
-                                                    <option value="" disabled selected hidden>Select Status</option>
-                                                    <option value="Active">Active</option>
-                                                    <option value="Inactive">Inactive</option>
-                                                </select>
-                                                @error('status') <span class="error text-red-900">{{ $message }}</span> @enderror
-                                            </div>
-                                            <!-- Start Date -->
-                                            <div>
-                                                <label class="block font-medium opacity-70">Start Date</label>
-                                                <input type="date" wire:model="start_date" class="text-gray-600 focus:outline-none focus:border focus:border-indigo-700 focus:ring-2 focus:ring-indigo-500 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
-                                                @error('start_date') <span class="error text-red-900">{{ $message }}</span> @enderror
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center justify-between py-8">
-                                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button>
-                                            <button x-on:click="$dispatch('close-modal',{name:'add-announcement'})" type="button" class="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">Close</button>
-                                        </div>
-                                    </form>
-                                </x-slot:body>
-                            </x-modal>
+<x-modal name="edit-announcement" title="Edit Announcement" max-width="4xl">
+    <x-slot:body>
+        <!-- Form -->
+        <form id="announcementForm" class="space-y-6" wire:submit.prevent="update">
+            @if ($errors->any())
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">There were {{ count($errors) }} errors with your submission</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <ul class="list-disc pl-5 space-y-1">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            <div class="space-y-6">
+                <!-- First Row -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Category -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Category</label>
+                        <select wire:model="category" class="mt-1 block w-full pl-3 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">
+                            <option value="all">All Categories</option>
+                            @foreach ($categories as $category)
+                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('category') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+
+                    <!-- Title -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Title</label>
+                        <input type="text" wire:model="title" placeholder="Announcement Title" 
+                            class="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        @error('title') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Content</label>
+                    <textarea wire:model="content" rows="5" placeholder="Announcement Content" 
+                        class="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                    @error('content') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+
+                <!-- Second Row -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Priority -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Priority</label>
+                        <select wire:model="priority" 
+                            class="mt-1 block w-full pl-3 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">
+                            <option value="" disabled selected hidden>Select Priority</option>
+                            <option value="Low">Minor</option>
+                            <option value="High">Urgent</option>
+                        </select>
+                        @error('priority') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+
+                    <!-- Status -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Status</label>
+                        <select wire:model="status" 
+                            class="mt-1 block w-full pl-3 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">
+                            <option value="" disabled selected hidden>Select Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                        @error('status') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+
+                    <!-- Start Date -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Start Date</label>
+                        <input type="date" wire:model="start_date" 
+                            class="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        @error('start_date') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                <button x-on:click="$dispatch('close-modal',{name:'edit-announcement'})" type="button" 
+                    class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Cancel
+                </button>
+                <button type="submit" 
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </x-slot:body>
+</x-modal>
                             @endif
                             @if($isDeleting)
                             <x-modal name="delete-announcement" title="Delete Announcement">
