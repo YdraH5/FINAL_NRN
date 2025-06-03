@@ -21,242 +21,108 @@ class ReservationController extends Controller
 {
     public $price;
     public function index($apartment, Request $request)
-{
-    $checkin = $request->query('checkin');
-    $rentalPeriod = $request->query('rentalPeriod');
-    $floorNumber = $request->query('floorNumber');
-    $adults = $request->query('adults');
-    $children = $request->query('children');
-    $infants = $request->query('infants');
-    $pets = $request->query('pets');
+    {
+        $checkin = $request->query('checkin');
+        $rentalPeriod = $request->query('rentalPeriod');
+        $floorNumber = $request->query('floorNumber');
+        $adults = $request->query('adults');
+        $children = $request->query('children');
+        $infants = $request->query('infants');
+        $pets = $request->query('pets');
 
-    $apartment = DB::table('apartment')
-        ->rightjoin('categories', 'categories.id', '=', 'apartment.category_id')
-        ->leftjoin('users', 'users.id', '=', 'apartment.renter_id')
-        ->select('categories.name as categ_name','categories.id as categ_id','categories.description','apartment.id','categories.price','apartment.status','users.id AS user_id')
-        ->where('apartment.id',$apartment)
-        ->where('apartment.status','Available')
-        ->get();
-    
-    foreach ($apartment as $id)
-    $category = Category::all()->where('id',$id->categ_id);
+        $apartment = DB::table('apartment')
+            ->rightjoin('categories', 'categories.id', '=', 'apartment.category_id')
+            ->leftjoin('users', 'users.id', '=', 'apartment.renter_id')
+            ->select('categories.name as categ_name','categories.id as categ_id','categories.description','apartment.id','categories.price','apartment.status','users.id AS user_id')
+            ->where('apartment.id',$apartment)
+            ->where('apartment.status','Available')
+            ->get();
+        
+        foreach ($apartment as $id)
+        $category = Category::all()->where('id',$id->categ_id);
 
-    // Get GCash payment details from settings
-    $gcashDetails = DB::table('settings')->first(['gcash_number', 'gcash_qr_image']);
+        return view('reserve.index', compact(
+            'apartment',
+            'category', 
+            'checkin', 
+            'rentalPeriod', 
+            'floorNumber', 
+            'adults', 
+            'children', 
+            'infants', 
+            'pets'
+        ));
+    }
 
-    return view('reserve.index', compact(
-        'apartment',
-        'category', 
-        'checkin', 
-        'rentalPeriod', 
-        'floorNumber', 
-        'adults', 
-        'children', 
-        'infants', 
-        'pets',
-        'gcashDetails' // Add this
-    ));
-}
     public function create(Request $request) {
         $data = $request->validate([
             'apartment_id' => 'required|numeric',
             'user_id' => 'required|numeric',
             'check_in' => 'required|date_format:Y-m-d',
             'occupants'=>'required|numeric',
-            'rental_period' => 'required|numeric',
-            'total_price' => 'required|numeric',
-            'payment_method' => 'required|string',
+            'rental_period' => 'required|numeric'
         ]);
-    
-        if ($data['payment_method'] === 'gcash') {
-            return $this->handleGcashPayment($data, $request);
-        } else {
-            return $this->handleStripePayment($data);
-        }
-    }
-    
-    private function handleGcashPayment(array $data, Request $request) {
 
-        $request->validate([
-            'receipt' => 'required|image|mimes:png,jpg,jpeg', // Making receipt nullable but validated if present
-        ]);
-        $data['payment_status'] = 'paid';
-
-        // Handle the image upload
-        if ($request->hasFile('receipt')) {
-            $file = $request->file('receipt');
-            $filename = time() . '.' . $file->getClientOriginalExtension();
-            $path = 'uploads/receipts/';
-            $file->move($path, $filename);
-            $data['receipt'] = $path . $filename;
-        }
+        // Update user role and apartment status
         DB::table('users')
-        ->where('id', $data['user_id'])
-        ->update(['role' => 'pending']);
+            ->where('id', $data['user_id'])
+            ->update(['role' => 'pending']);
+            
         DB::table('apartment')
-        ->where('id', $data['apartment_id'])
-        ->update(['status' => 'Under Review']);
-        // Save the reservation
+            ->where('id', $data['apartment_id'])
+            ->update(['status' => 'Under Review']);
+
+        // Create reservation with pending status
         $reservation = Reservation::create([
             'apartment_id' => $data['apartment_id'],
             'user_id' => $data['user_id'],
             'check_in' => $data['check_in'],
             'occupants'=> $data['occupants'],
             'rental_period' => $data['rental_period'],
-            'total_price' => $data['total_price'],
-            'status' => 'Pending',
+            'status' => 'Pending'
         ]);
-    
-        Payment::create([
-            'reservation_id' => $reservation->id,
-            'apartment_id' => $data['apartment_id'],
-            'user_id' => $data['user_id'],
-            'amount' => $data['total_price'],
-            'category' => 'Reservation fee',
-            'transaction_id' => null,
-            'payment_method' => 'gcash',
-            'status' => 'pending',
-            'receipt' => $data['receipt'],
-        ]);
-    
-        return redirect()->route('reserve.wait')->with('success', 'Please wait patiently, the admin is verifying your payment and reservation.');
+
+        return redirect()->route('reserve.wait')->with('success', 'Your reservation request has been submitted. Please wait for admin approval.');
     }
-    
-    private function handleStripePayment(array $data) {
-        $stripe = new \Stripe\StripeClient('sk_test_51PSmA3DXXNLXbAhja04flayIKgxlLKafmgY0BG8j3asXy3rZKDHladG5yY8204bV1JcnBxNic09F7IpMtTrivJAw00lD4MswJX');
 
-    
-        $categ = DB::table('apartment')
-            ->where('id', $data['apartment_id'])
-            ->select('category_id', 'id')
-            ->first();
-    
-        $category = Category::find($categ->category_id);
-    
-        $session = $stripe->checkout->sessions->create([
-            'line_items' => [[
-                'price_data' => [
-                    'currency' => 'php',
-                    'product_data' => [
-                        'name' => $category->name,
-                    ],
-                    'unit_amount' => $data['total_price'] * 100,
-                ],
-                'quantity' => 1,
-            ]],
-            'mode' => 'payment',
-            'success_url' => route('reserve.payment_success', [], true) . "?session_id={CHECKOUT_SESSION_ID}",
-            'cancel_url' => route('reserve.index', ['apartment' => $categ->id], true),
-            'metadata' => [
-                'user_id' => $data['user_id'],
-                'apartment_id' => $data['apartment_id'],
-                'check_in' => $data['check_in'],
-                'occupants'=> $data['occupants'],
-                'rental_period' => $data['rental_period'],
-                'total_price' => $data['total_price'],
-            ],
-        ]);
-    
-        return redirect($session->url);
-    }
-    public function paymentSuccess(Request $request) {
-        $stripe = new \Stripe\StripeClient('sk_test_51PSmA3DXXNLXbAhja04flayIKgxlLKafmgY0BG8j3asXy3rZKDHladG5yY8204bV1JcnBxNic09F7IpMtTrivJAw00lD4MswJX');
-        $session_id = $request->get('session_id');
-
-        try {
-            $session = $stripe->checkout->sessions->retrieve($session_id);
-        } catch (\Exception $e) {
-            return back()->withErrors('Payment confirmation failed.');
-        }
-
-        if ($session && $session->payment_status === 'paid') {
-            $data = [
-                'user_id' => $session->metadata->user_id,
-                'apartment_id' => $session->metadata->apartment_id,
-                'check_in' => $session->metadata->check_in,
-                'rental_period' => $session->metadata->rental_period,
-                'total_price' => $session->metadata->total_price,
-                'occupants'=> $session->metadata->occupants,
-                'payment_method' => 'stripe',
-                'status' => 'approved'
-            ];
-
-            $reservation = Reservation::create($data);
-
-            if ($reservation) {
-                DB::table('users')
-                    ->where('id', $data['user_id'])
-                    ->update(['role' => 'reserve']);
-
-                DB::table('apartment')
-                    ->where('id', $data['apartment_id'])
-                    ->where('status', 'Available')
-                    ->limit(1)
-                    ->update(['status' => 'Reserved']);
-
-                Payment::create([
-                    'reservation_id' => $reservation->id,
-                    'apartment_id' => $data['apartment_id'],
-                    'user_id' => $data['user_id'],
-                    'amount' => $data['total_price'],
-                    'category' => 'Reservation fee',
-                    'transaction_id' => $session->id,
-                    'status' => 'paid',
-                    'payment_method' => 'stripe',
-                ]);
-
-                $user = Auth::user();
-                Mail::to($user->email)->send(new ReservationSuccess([
-                    'name' => $user->name,
-                    'payment' => $data['total_price'],
-                ]));
-
-                return redirect()->route('reserve.wait')->with('success', 'Reservation and payment confirmed.');
-            }
-        }
-
-        return back()->withErrors('Reservation could not be created.');
-    }    
-    
     public function waiting(Request $request)
     {
         $user = auth()->user();
     
-        
-        // Fetch the reservation and payment information
+        // Fetch the reservation information
         $reserve_date = DB::table('reservations')
-            ->join('payments', 'payments.reservation_id', '=', 'reservations.id')
             ->select(
                 'reservations.check_in',
                 'reservations.apartment_id',
                 'reservations.created_at',
-                'payments.status',
                 'reservations.status as reserve_status',
                 'reservations.id as reservation_id'
             )
-            ->where('reservations.user_id', $user->id) // Note: Prefixed 'user_id' with 'reservations.'
-            ->whereNot('reservations.status','canceled')
+            ->where('reservations.user_id', $user->id)
             ->limit(1)
             ->get();
+            
         $category = Appartment::where('id',$reserve_date->pluck('apartment_id'))
                     ->select('category_id')
                     ->get();
-                    foreach($category as $categ){
-                        $categoryImages = DB::table('category_images')
-                            ->where('category_id', $categ->category_id)
-                            ->get();
-                    }
-        // Pass both the reservation data and the success message
+                    
+        foreach($category as $categ){
+            $categoryImages = DB::table('category_images')
+                ->where('category_id', $categ->category_id)
+                ->get();
+        }
+        
         return view('reserve.wait', [
             'reservations' => $reserve_date,
-            'images' =>$categoryImages,
-            'success' => 'Payment has been successful'
+            'images' => $categoryImages,
+            'success' => 'Reservation request submitted successfully'
         ]);
     }
     
     public function edit(){
         return view('reserve.edit');
     }
+    
     public function update(int $user_id, int $apartment_id, int $reservation)
     {
         // Start a database transaction
@@ -348,10 +214,4 @@ class ReservationController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-    
-
-        
 }
-    
-    
-

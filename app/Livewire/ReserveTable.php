@@ -179,7 +179,6 @@ class ReserveTable extends Component
             ->join('apartment', 'apartment.id', '=', 'reservations.apartment_id')
             ->join('buildings', 'buildings.id', '=', 'apartment.building_id')
             ->join('categories', 'categories.id', '=', 'apartment.category_id')
-            ->join('payments', 'reservations.id', '=', 'payments.reservation_id')
             ->select(
                 'apartment.id as apartment_id',
                 'users.id as user_id',
@@ -194,11 +193,7 @@ class ReserveTable extends Component
                 'reservations.id as reservation_id',
                 'reservations.created_at',
                 'reservations.check_in',
-                'reservations.total_price',
-                'reservations.status as reservation_status',
-                'payments.receipt',
-                'payments.payment_method',
-                'payments.status'
+                'reservations.status as reservation_status'
             )
             ->orderBy($this->sortColumn, $this->sortDirection);
 
@@ -212,8 +207,6 @@ class ReserveTable extends Component
             'buildings.name',
             'reservations.check_in',
             'reservations.rental_period',
-            'payments.status',
-            'reservations.total_price'
         ];
 
         // Apply search filter

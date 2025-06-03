@@ -42,14 +42,10 @@
         $monthlyApproved = $currentMonthReservations->where('reservation_status', 'approved')->count();
         $monthlyPending = $currentMonthReservations->where('reservation_status', 'pending')->count();
         $monthlyRejected = $currentMonthReservations->where('reservation_status', 'rejected')->count();
-        $monthlyRevenue = $currentMonthReservations->sum('total_price');
     @endphp
     
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-blue-100 p-6 rounded-lg shadow-md">
-            <h3 class="text-lg font-medium text-blue-600">Total Reservations</h3>
-            <p class="text-4xl font-bold">{{ $monthlyTotal }}</p>
-        </div>
+
         <div class="bg-green-100 p-6 rounded-lg shadow-md">
             <h3 class="text-lg font-medium text-green-600">Approved</h3>
             <p class="text-4xl font-bold">{{ $monthlyApproved }}</p>
@@ -119,12 +115,6 @@
                             <x-datatable-item :sortColumn="$sortColumn" :sortDirection="$sortDirection" columnName="rental_period" />
                         </div>
                     </th>
-                    <th wire:click="doSort('status')" class="py-3 px-4 text-center border-b border-indigo-600 cursor-pointer">
-                        <div class="inline-flex items-center justify-center">
-                            Payment Status
-                            <x-datatable-item :sortColumn="$sortColumn" :sortDirection="$sortDirection" columnName="status" />
-                        </div>
-                    </th>
                     <th wire:click="doSort('total_price')" class="py-3 px-4 text-center border-b border-indigo-600 cursor-pointer">
                         <div class="inline-flex items-center justify-center">
                             Total Amount
@@ -146,7 +136,6 @@
                     <td class="py-3 px-4 text-center border-b border-gray-300">{{$reservation->check_in_date}}</td>
                     <td class="py-3 px-4 text-center border-b border-gray-300">{{$reservation->rental_period}} Months</td>
                     <td class="py-3 px-4 text-center border-b border-gray-300">{{$reservation->reservation_status}}</td>
-                    <td class="py-3 px-4 text-center border-b border-gray-300">₱{{ number_format($reservation->total_price, 2) }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -189,14 +178,8 @@
                     </th>
                     <th wire:click="doSort('status')" class="py-3 px-4 text-center border-b border-indigo-600 cursor-pointer">
                         <div class="inline-flex items-center justify-center">
-                            Payment Status
+                            Reservation Status
                             <x-datatable-item :sortColumn="$sortColumn" :sortDirection="$sortDirection" columnName="status" />
-                        </div>
-                    </th>
-                    <th wire:click="doSort('total_price')" class="py-3 px-4 text-center border-b border-indigo-600 cursor-pointer">
-                        <div class="inline-flex items-center justify-center">
-                            Total Amount
-                            <x-datatable-item :sortColumn="$sortColumn" :sortDirection="$sortDirection" columnName="total_price" />
                         </div>
                     </th>
                 </tr>
@@ -210,7 +193,6 @@
                     <td class="py-3 px-4 text-center border-b border-gray-300">{{$reservation->check_in_date}}</td>
                     <td class="py-3 px-4 text-center border-b border-gray-300">{{$reservation->rental_period}} Months</td>
                     <td class="py-3 px-4 text-center border-b border-gray-300">{{$reservation->reservation_status}}</td>
-                    <td class="py-3 px-4 text-center border-b border-gray-300">₱{{ number_format($reservation->total_price, 2) }}</td>
                 </tr>
                 @endforeach
             </tbody>

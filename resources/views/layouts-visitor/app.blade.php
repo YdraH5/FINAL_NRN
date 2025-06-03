@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         /* Fade-In Animation */
 .fade-in {
@@ -18,7 +19,33 @@
 .fade-in-visible {
     opacity: 1;
 }
-
+ @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .animate-fadeInUp {
+        animation: fadeInUp 1s ease-out forwards;
+    }
+    .animate-bounce {
+        animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0) translateX(-50%);
+        }
+        40% {
+            transform: translateY(-20px) translateX(-50%);
+        }
+        60% {
+            transform: translateY(-10px) translateX(-50%);
+        }
+    }
 /* Slide-In Animation */
 .slide-in {
     transform: translateX(100%);

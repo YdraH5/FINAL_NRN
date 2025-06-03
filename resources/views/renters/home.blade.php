@@ -396,7 +396,6 @@
                         <option value="" disabled selected>Select Payment Method</option>
                         <option value="gcash">GCash</option>
                         <option value="cash">Cash (Office Payment)</option>
-                        <option value="stripe">Credit/Debit Card</option>
                     </select>
                 </div>
 

@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->date('check_in');
             $table->integer('rental_period');
-            $table->integer('total_price');
             $table->string('status')->nullable();
             $table->softDeletes(); 
             $table->timestamps();

@@ -159,7 +159,6 @@ Route::group(['middleware' => ['auth','verified']], function () {
 
 
         });
-        Route::post('/renters/pay-multiple', [RenterController::class, 'payMultiple'])->name('renters.payMultiple');
 
         Route::get('/renters/home',[RenterController::class,'index'])->name('renters.home');        
         Route::get('/renters/{id}/{apartment}/{reservation}/resend',[RenterController::class,'resend'])->name('renters.resend');

@@ -155,43 +155,6 @@ class RenterController extends Controller
         return redirect()->route('renters.home')->with('success', 'Your payment is under verification by our admin.');
     }
     
-    
-    private function handleStripePayment(array $data) {
-        $stripe = new \Stripe\StripeClient('sk_test_51PSmA3DXXNLXbAhja04flayIKgxlLKafmgY0BG8j3asXy3rZKDHladG5yY8204bV1JcnBxNic09F7IpMtTrivJAw00lD4MswJX');
-
-    
-        $categ = DB::table('apartment')
-            ->where('id', $data['apartment_id'])
-            ->select('category_id', 'id')
-            ->first();
-    
-        $category = Category::find($categ->category_id);
-    
-        $session = $stripe->checkout->sessions->create([
-            'line_items' => [[
-                'price_data' => [
-                    'currency' => 'php',
-                    'product_data' => [
-                        'name' => 'Rent Fee',
-                    ],
-                    'unit_amount' => $data['amount_due'] * 100,
-                ],
-                'quantity' => 1,
-            ]],
-            'mode' => 'payment',
-            'success_url' => route('renters.paid', [], true) . "?session_id={CHECKOUT_SESSION_ID}",
-            'cancel_url' => route('renters.home', ['apartment' => $categ->id], true),
-            'metadata' => [
-                'user_id' => (string) $data['user_id'], // Cast to string
-                'due_id' => (string) $data['due_id'], // Cast to string
-                'apartment_id' => (string) $data['apartment_id'], // Cast to string
-                'amount_due' => (string) $data['amount_due'], // Cast to string
-            ],
-        ]);
-        
-    
-        return redirect($session->url);
-    }
     public function paymentSuccess(Request $request) {
         $stripe = new \Stripe\StripeClient('sk_test_51PSmA3DXXNLXbAhja04flayIKgxlLKafmgY0BG8j3asXy3rZKDHladG5yY8204bV1JcnBxNic09F7IpMtTrivJAw00lD4MswJX');
         $session_id = $request->get('session_id');

@@ -17,7 +17,6 @@
                     <label class="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
                     <input type="number" name="user_id" value="{{ Auth::user()->id }}" hidden>
                     <input type="number" name="apartment_id" value="{{ $data->id }}" hidden>
-                    <input type="text" name="payment_status" value="paid" hidden>
                     <input class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight" readonly type="text" value="{{ Auth::user()->name }}">
                 </div>
                 <div class="mb-4">
@@ -42,40 +41,9 @@
                     <x-input-error :messages="$errors->get('check_in')" class="mt-2" />
                 </div>
                 <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Reservation Fee (₱)</label>
-                    <input class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight" type="text" readonly name="total_price" value="{{$data->price * .05}}">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Rental Period (months)</label>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Stay Duration (months)</label>
                     <input class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight" type="number" min="1" name="rental_period" value="{{$rentalPeriod}}">
                     <x-input-error :messages="$errors->get('rental_period')" class="mt-2" />
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Payment Method</label>
-                    <select class="shadow border rounded w-full py-2 pr-10 pl-3 text-gray-700 leading-tight" id="paymentMethod" name="payment_method" onchange="toggleImageUpload()">
-                        <option value="" disabled selected hidden>Select Payment Method</option>
-                        <option value="gcash">Gcash</option>
-                        <option value="stripe">Stripe</option>
-                    </select>
-                </div>
-                <!-- Replace the GCash details section in your form with this: -->
-                <div class="mb-4 hidden" id="gcashUpload">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Upload Gcash Receipt</label>
-                    <input type="file" name="receipt" id="gcashReceipt" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight">
-                    
-                    @if($gcashDetails)
-                    <div class="mb-4" id="gcashDetails">
-                        <p class="text-gray-700 text-sm font-bold mb-2">Scan the QR code below or note down the Gcash number for payment:</p>
-                        
-                        @if($gcashDetails->gcash_qr_image)
-                            <img src="{{ asset('storage/' . $gcashDetails->gcash_qr_image) }}" alt="GCash QR Code" class="mb-2 max-w-xs">
-                        @endif
-                        
-                        @if($gcashDetails->gcash_number)
-                            <p class="text-gray-700 font-semibold">GCash Number: {{ $gcashDetails->gcash_number }}</p>
-                        @endif
-                    </div>
-                    @endif
                 </div>
                 <div class="mb-4" x-data="{ agreed: false }">
                     <label class="block text-gray-700 text-sm font-bold mb-2">
@@ -118,15 +86,6 @@
 @endforeach
 <script src="{{ asset('js/total.js') }}"></script>
 <script>
-    function toggleImageUpload() {
-        var paymentMethod = document.getElementById("paymentMethod").value;
-        var gcashUpload = document.getElementById("gcashUpload");
-        if (paymentMethod === "gcash") {
-            gcashUpload.style.display = "block";
-        } else {
-            gcashUpload.style.display = "none";
-        }
-    }
      // Function to get today's date and the date one week from now
      function setMinCheckInDate() {
     var today = new Date();
