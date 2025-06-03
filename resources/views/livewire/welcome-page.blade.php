@@ -18,7 +18,7 @@
                 <div class="space-y-6 text-left">
                     
                     <!-- Main Headline -->
-                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-serif font-medium leading-tight tracking-tight">
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-san-serif font-medium leading-tight tracking-tight">
                         <span class="block text-gray-50">Your Comfort,</span>
                         <span class="block text-blue-300/90 italic font-light">Our Commitment</span>
                     </h1>
@@ -54,15 +54,15 @@
             <div class="max-w-full mx-auto">
                 <!-- Section Header -->
                 <div class="text-center mb-16">
-                    <h2 class="font-serif text-3xl md:text-4xl lg:text-5xl text-gray-900 mb-6 leading-tight">
+                    <h2 class="font-san-serif text-3xl md:text-4xl lg:text-5xl text-gray-900 mb-6 leading-tight">
                         About Us
                     </h2>
                     @isset($settings->discover_description)
-                    <p class="text-lg text-gray-600 max-w-6xl mx-auto mt-4">
+                    <p class="text-lg text-gray-800 max-w-6xl mx-auto mt-4">
                         {{ $settings->discover_description }}
                     </p>
                     @else
-                    <p class="text-lg text-gray-600 max-w-3xl mx-auto mt-4">
+                    <p class="text-lg text-gray-800 max-w-3xl mx-auto mt-4">
                         Experience refined living at NRN Building in Mission Hills, Roxas City - where comfort meets modern convenience.
                     </p>
                     @endisset
@@ -80,17 +80,17 @@
                     <!-- Right Text - Now perfectly aligned with image height -->
                     <div class="w-full md:w-1/2 flex flex-col justify-center"> <!-- Added flex container for vertical centering -->
                         <div class="mb-6">
-                            <h3 class="text-2xl md:text-3xl font-bold text-gray-900">
+                            <h3 class="font-san-serif text-3xl md:text-4xl lg:text-5xl text-gray-900 mb-2 leading-tight">
                                 Designed for Comfort
                             </h3>
                         </div>
                         
                         @isset($settings->designed_description)
-                        <p class="text-gray-600 mb-6 leading-relaxed">
+                        <p class="text-lg text-gray-800 max-w-6xl mx-auto mt-4 mb-4">
                             {{ $settings->designed_description }}
                         </p>
                         @else
-                        <p class="text-gray-600 mb-6 leading-relaxed">
+                        <p class="text-lg text-gray-800 max-w-6xl mx-auto mt-4">
                             NRN Building features 30 thoughtfully designed rooms with premium amenities, secured parking, 
                             and modern comforts in the heart of Roxas City. Our spaces are crafted to provide an elevated 
                             living experience for both short and long-term residents.
@@ -105,7 +105,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
-                                <span class="ml-2 text-gray-700">30 elegant, fully-furnished rooms</span>
+                                <span class="text-lg text-gray-800 max-w-6xl">30 elegant, fully-furnished rooms</span>
                             </li>
                             <li class="flex items-start">
                                 <div class="flex-shrink-0 mt-0.5">
@@ -113,7 +113,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
-                                <span class="ml-2 text-gray-700">24/7 security and CCTV monitoring</span>
+                                <span class="text-lg text-gray-800 max-w-6xl">24/7 security and CCTV monitoring</span>
                             </li>
                             <li class="flex items-start">
                                 <div class="flex-shrink-0 mt-0.5">
@@ -121,7 +121,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
-                                <span class="ml-2 text-gray-700">Free high-speed WiFi access</span>
+                                <span class="text-lg text-gray-800 max-w-6xl">Free high-speed WiFi access</span>
                             </li>
                             <li class="flex items-start">
                                 <div class="flex-shrink-0 mt-0.5">
@@ -129,7 +129,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
-                                <span class="ml-2 text-gray-700">Prime Mission Hills location</span>
+                                <span class="text-lg text-gray-600 max-w-6xl">Prime Mission Hills location</span>
                             </li>
                         </ul>
                     </div>
@@ -142,11 +142,11 @@
             <div class="max-w-full mx-auto">
                 <!-- Section Header -->
                 <div class="text-center mb-12 md:mb-16">
-                    <h3 class="font-serif text-3xl md:text-4xl lg:text-5xl text-gray-900 mb-6 leading-tight">Landmarks Near Our Residence</h3>
+                    <h3 class="font-san-serif text-3xl md:text-4xl lg:text-5xl text-gray-900 mb-6 leading-tight">Landmarks Near Our Residence</h3>
                     @isset($settings->neary_description)
-                    <p class="text-lg md:text-xl text-gray-600 leading-relaxed max-w-5xl mx-auto">{{ $settings->neary_description }}</p>
+                    <p class="text-lg text-gray-800 max-w-6xl mx-auto">{{ $settings->neary_description }}</p>
                     @else
-                    <p class="text-lg md:text-xl text-gray-600 leading-relaxed max-w-5xl mx-auto">
+                    <p class="text-lg text-gray-600 max-w-6xl mx-auto">
                         Discover premium amenities and cultural landmarks surrounding the NRN Building, offering unparalleled convenience and lifestyle opportunities within walking distance.
                     </p>
                     @endisset
@@ -212,9 +212,9 @@
             <div class="max-w-full mx-auto">
                 <!-- Section Header -->
                 <div class="text-center mb-8 md:mb-8">
-                    <h2 class="font-serif text-3xl md:text-4xl lg:text-5xl text-gray-900 mb-6 leading-tight">Rooms We Offer</h2>
+                    <h2 class="font-san-serif text-3xl md:text-4xl lg:text-5xl text-gray-900 mb-6 leading-tight">Rooms We Offer</h2>
                     @isset($settings->apartment_description)
-                    <p class="text-lg md:text-xl text-gray-600 leading-relaxed max-w-5xl mx-auto font-light">
+                    <p class="text-lg text-gray-800 max-w-6xl mx-auto">
                         {{ $settings->apartment_description }}
                     </p>
                     @else
@@ -279,7 +279,7 @@
                             <!-- Apartment Details -->
                             <div class="p-6">
                                 <div class="flex justify-between items-start mb-4">
-                                    <h3 class="text-xl font-serif font-semibold text-gray-900">{{ $category->category_name }}</h3>
+                                    <h3 class="text-xl font-san-serif font-semibold text-gray-900">{{ $category->category_name }}</h3>
                                     <span class="text-blue-600 font-medium">₱{{ number_format($category->price, 0) }}/mo</span>
                                 </div>
 
