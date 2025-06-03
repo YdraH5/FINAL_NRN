@@ -14,10 +14,10 @@ class CategoryTable extends Component
 {   
     use WithPagination;
     public $deleteId;
+    public $isDeleting = false;
     public $isEditing= false;// to only run the form when the user clicked the edit icon
     public $id; // to save the id that the user want to edit
     public $editCategory;// to save data that use is going to edit
-    public $isDeleting = false;
     #[Validate('required|min:5|max:50')] 
     public $name = '';
  

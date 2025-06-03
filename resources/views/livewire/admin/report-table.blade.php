@@ -83,6 +83,7 @@
                         @endif
                     <td class="py-3 px-4 text-center border-b border-gray-300">{{ \Carbon\Carbon::parse($report->date)->diffForHumans() }}</td>
                     <td class="py-3 px-4 text-center border-b border-gray-300">
+                        
                         <x-modal name="solve-report" title="Solve Report">
                             <x-slot:body>
                                 <form id="modalForm" class="space-y-6" wire:submit.prevent="action">

@@ -141,6 +141,25 @@ Route::group(['middleware' => ['auth','verified']], function () {
         Route::get('/owner/occupants', function () {
             return view('/owner/occupants');
         })->name('owner.occupants.index');
+                // ROUTE TO ANNOUNCEMENT
+        Route::get('/owner/announcement', function () {
+            return view('/owner/announcement');
+        })->name('owner.announcement.index');
+
+        // ROUTE TO NEARBY ESTABLISHMENTS
+        Route::get('/owner/nearby-establishment', function () {
+            return view('/owner/nearby-establishment');
+        })->name('owner.nearby-establishment.index');
+
+        // ROUTE TO NEARBY ESTABLISHMENTS
+        Route::get('/owner/landing-page', function () {
+            return view('/owner/landing-page');
+        })->name('owner.landing_page.index');
+
+        // ROUTE TO ACTIVITY LOGS
+        Route::get('/owner/logs', function () {
+            return view('/owner/logs');
+        })->name('owner.logs.index');
     });
 
 

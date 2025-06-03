@@ -18,34 +18,48 @@
 
     <!-- Print-Only Section -->
     <div class="print-only bg-white p-6 rounded-lg shadow-md mb-6">
-        <!-- Logo and Title -->
-        <div class="flex items-center justify-between mb-4">
-            <img src="{{ asset('images/NRN LOGO.png') }}" class="h-16">
-            <div class="text-center">
-                <h1 class="text-2xl font-bold text-gray-800">Reservation Management Report</h1>
-                <p class="text-gray-600 text-sm">Generated on: {{ date('F d, Y') }}</p>
-            </div>
+    <!-- Logo and Title -->
+    <div class="flex items-center justify-between mb-4">
+        <img src="{{ asset('images/NRN LOGO.png') }}" class="h-16">
+        <div class="text-center">
+            <h1 class="text-2xl font-bold text-gray-800">Monthly Reservation Report</h1>
+            <p class="text-gray-600 text-sm">For: {{ date('F Y') }}</p>
+            <p class="text-gray-600 text-sm">Generated on: {{ date('F d, Y') }}</p>
         </div>
+    </div>
 
-        <h2 class="text-xl font-semibold mb-6 text-indigo-600">Reservation Summary</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div class="bg-blue-100 p-6 rounded-lg shadow-md">
-                <h3 class="text-lg font-medium text-blue-600">Total Reservations</h3>
-                <p class="text-4xl font-bold">{{ $totalReservations }}</p>
-            </div>
-            <div class="bg-green-100 p-6 rounded-lg shadow-md">
-                <h3 class="text-lg font-medium text-green-600">Approved</h3>
-                <p class="text-4xl font-bold">{{ $approvedCount }}</p>
-            </div>
-            <div class="bg-yellow-100 p-6 rounded-lg shadow-md">
-                <h3 class="text-lg font-medium text-yellow-600">Pending</h3>
-                <p class="text-4xl font-bold">{{ $pendingCount }}</p>
-            </div>
-            <div class="bg-red-100 p-6 rounded-lg shadow-md">
-                <h3 class="text-lg font-medium text-red-600">Rejected</h3>
-                <p class="text-4xl font-bold">{{ $rejectedCount }}</p>
-            </div>
+    <h2 class="text-xl font-semibold mb-6 text-indigo-600">Monthly Reservation Summary</h2>
+    
+    @php
+        // Filter reservations for current month
+        $currentMonthReservations = $reservations->filter(function ($reservation) {
+            return \Carbon\Carbon::parse($reservation->check_in)->isCurrentMonth() && 
+                   \Carbon\Carbon::parse($reservation->check_in)->isCurrentYear();
+        });
+        
+        // Calculate monthly counts
+        $monthlyTotal = $currentMonthReservations->count();
+        $monthlyApproved = $currentMonthReservations->where('reservation_status', 'approved')->count();
+        $monthlyPending = $currentMonthReservations->where('reservation_status', 'pending')->count();
+        $monthlyRejected = $currentMonthReservations->where('reservation_status', 'rejected')->count();
+    @endphp
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+
+        <div class="bg-green-100 p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-medium text-green-600">Approved</h3>
+            <p class="text-4xl font-bold">{{ $monthlyApproved }}</p>
         </div>
+        <div class="bg-yellow-100 p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-medium text-yellow-600">Pending</h3>
+            <p class="text-4xl font-bold">{{ $monthlyPending }}</p>
+        </div>
+        <div class="bg-red-100 p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-medium text-red-600">Rejected</h3>
+            <p class="text-4xl font-bold">{{ $monthlyRejected }}</p>
+        </div>
+    </div>
+
 
         <!-- Prepared By Section -->
         <div class="mt-10 border-t pt-4">
@@ -53,7 +67,19 @@
             <p class="text-gray-600 text-sm">Position: {{ auth()->user()->role }}</p>
         </div>
     </div>
-
+    @if (session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '{{ session('success') }}',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            });
+        </script>
+    @endif
     <!-- Table Section -->
     <div class="print-only overflow-x-auto bg-white shadow-lg">
         <table class="min-w-full mx-2 border-collapse">
@@ -89,12 +115,6 @@
                             <x-datatable-item :sortColumn="$sortColumn" :sortDirection="$sortDirection" columnName="rental_period" />
                         </div>
                     </th>
-                    <th wire:click="doSort('status')" class="py-3 px-4 text-center border-b border-indigo-600 cursor-pointer">
-                        <div class="inline-flex items-center justify-center">
-                            Payment Status
-                            <x-datatable-item :sortColumn="$sortColumn" :sortDirection="$sortDirection" columnName="status" />
-                        </div>
-                    </th>
                     <th wire:click="doSort('total_price')" class="py-3 px-4 text-center border-b border-indigo-600 cursor-pointer">
                         <div class="inline-flex items-center justify-center">
                             Total Amount
@@ -116,7 +136,6 @@
                     <td class="py-3 px-4 text-center border-b border-gray-300">{{$reservation->check_in_date}}</td>
                     <td class="py-3 px-4 text-center border-b border-gray-300">{{$reservation->rental_period}} Months</td>
                     <td class="py-3 px-4 text-center border-b border-gray-300">{{$reservation->reservation_status}}</td>
-                    <td class="py-3 px-4 text-center border-b border-gray-300">₱{{ number_format($reservation->total_price, 2) }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -147,7 +166,7 @@
                     </th>
                     <th wire:click="doSort('check_in')" class="py-3 px-4 text-center border-b border-indigo-600 cursor-pointer">
                         <div class="inline-flex items-center justify-center">
-                            Check In
+                            Visit Date
                             <x-datatable-item :sortColumn="$sortColumn" :sortDirection="$sortDirection" columnName="check_in" />
                         </div>
                     </th>
@@ -159,16 +178,11 @@
                     </th>
                     <th wire:click="doSort('status')" class="py-3 px-4 text-center border-b border-indigo-600 cursor-pointer">
                         <div class="inline-flex items-center justify-center">
-                            Payment Status
+                             Status
                             <x-datatable-item :sortColumn="$sortColumn" :sortDirection="$sortDirection" columnName="status" />
                         </div>
                     </th>
-                    <th wire:click="doSort('total_price')" class="py-3 px-4 text-center border-b border-indigo-600 cursor-pointer">
-                        <div class="inline-flex items-center justify-center">
-                            Total Amount
-                            <x-datatable-item :sortColumn="$sortColumn" :sortDirection="$sortDirection" columnName="total_price" />
-                        </div>
-                    </th>
+                    <th class="py-3 px-4 text-center border-b border-indigo-600">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -180,7 +194,28 @@
                     <td class="py-3 px-4 text-center border-b border-gray-300">{{$reservation->check_in_date}}</td>
                     <td class="py-3 px-4 text-center border-b border-gray-300">{{$reservation->rental_period}} Months</td>
                     <td class="py-3 px-4 text-center border-b border-gray-300">{{$reservation->reservation_status}}</td>
-                    <td class="py-3 px-4 text-center border-b border-gray-300">₱{{ number_format($reservation->total_price, 2) }}</td>
+                    <td class="py-3 px-4 text-center border-b border-gray-300">
+                        @if($reservation->reservation_status !== 'Approved')
+                        <button 
+                            x-data="{ id: {{$reservation->reservation_id}} }"
+                            x-on:click="$wire.set('id', id); $dispatch('open-modal', { name: 'approve-reservation' })"
+                            wire:click="approve(id)"
+                            class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-sm"
+                        >
+                            Approve
+                        </button>
+                                                <!-- Reject Button -->
+                        <button 
+                            x-data="{ id: {{$reservation->reservation_id}} }"
+                            x-on:click="$wire.set('id', id); $dispatch('open-modal', { name: 'reject-reservation' })"
+                            wire:click="reject(id)"
+                            class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm"
+                        >
+                            Reject
+                        </button>
+
+                        @endif
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
@@ -193,24 +228,59 @@
         </div>
     </div>
 
-    <!-- Modal for Viewing Receipt -->
-    <x-modal name="view-receipt" title="Receipt">
+    <!-- Reject Confirmation Modal -->
+    <x-modal name="reject-reservation" title="Confirm Rejection">
         <x-slot name="body">
-            <div class="p-4 flex flex-col items-center">
-                @if($currentReceipt)
-                <img src="{{ $currentReceipt }}" alt="Receipt Image" style="max-height: 400px; max-width: 100%;">
-                @endif
-                <div class="flex justify-end py-2">
-                    <button wire:click ="reject({{$id}})" x-on:click="$dispatch('close-modal',{name:'view-receipt'})" type="button"
-                        class="bg-red-400 hover:bg-red-600 text-white font-bold py-2 px-4 rounded mr-4">Reject</button>
-                    @if($currentStatus === 'pending')
-                    <button type="button"
-                        class="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded"
-                        wire:click="approve({{ $id }})"
-                        x-on:click="$dispatch('close-modal',{name:'view-receipt'})">Approve</button>
-                    @endif
+            <div class="p-6">
+                <div class="flex justify-center mb-4">
+                    <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-center mb-2">Reject this reservation?</h3>
+                <p class="text-gray-600 text-center mb-6">The tenant will be notified of the rejection.</p>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" class="px-4 py-2 border border-gray-300 rounded-md"
+                        x-on:click="$dispatch('close-modal',{name:'reject-reservation'})">
+                        Cancel
+                    </button>
+                    <button type="button" class="px-4 py-2 bg-red-600 text-white rounded-md"
+                        wire:click="rejected">
+                        Confirm Rejection
+                    </button>
                 </div>
             </div>
         </x-slot>
     </x-modal>
+    @if ($isApprove)
+    <!-- Modal for approving reservation -->
+    <x-modal name="approve-reservation" title="Approve Reservation">
+        <x-slot name="body">
+            <div class="p-6">
+                
+                <!-- Confirmation message -->
+                <h3 class="text-lg font-semibold text-center text-gray-800 mb-2">Confirm Reservation Approval</h3>
+                <p class="text-gray-600 text-center mb-6">This will mark the apartment as reserved and notify the tenant.</p>
+                
+                <!-- Action buttons -->
+                <div class="flex justify-end space-x-3">
+                    <button 
+                        type="button" 
+                        class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition"
+                        x-on:click="$dispatch('close-modal',{name:'approve-reservation'})"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        type="button" 
+                        class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition"
+                        wire:click="approved"
+                    >
+                        Confirm Approval
+                    </button>
+                </div>
+            </div>
+        </x-slot>
+    </x-modal>
+    @endif
 </div>

@@ -1,6 +1,6 @@
 @section('title', 'Activity Logs')
 
-<x-app-layout>
+<x-owner-layout>
 @section('content')
 <section class="text-gray-700 body-font mx-4 mt-6">
     @php
@@ -202,4 +202,4 @@
     </div>
 </section>
 @endsection
-</x-app-layout>
+</x-owner-layout>

@@ -20,7 +20,38 @@ class ReportTable extends Component
     public $sortDirection="ASC";
     public $sortColumn ="name";
     public $perPage = 10;
-
+    public $deleteId;
+    public $isDeleting = false;
+    public function delete($id){
+        $this->isDeleting = true;
+        $this->deleteId = $id;
+    }
+    // public function deleted(){
+    //     $delete = Category::find($this->deleteId)->delete();
+    //     if($delete){
+    //         $this->reset();
+    //         return redirect()->route('owner.categories.index')->with('success','Category deleted successfully.');
+    //     }
+    //     $this->isDeleting=false;
+    // }
+    public function deleted(){
+        try {
+            $report = Report::findOrFail($this->id);
+            $report->delete();
+            
+            if (auth()->user()->role === 'admin') {
+                return redirect()->route('admin.reports.index')->with('success', 'Report deleted successfully');
+            } elseif (auth()->user()->role === 'owner') {
+                return redirect()->route('owner.reports.index')->with('success', 'Report deleted successfully');
+            }
+        } catch (\Exception $e) {
+            if (auth()->user()->role === 'admin') {
+                return redirect()->route('admin.reports.index')->with('error', 'Failed to delete report');
+            } elseif (auth()->user()->role === 'owner') {
+                return redirect()->route('owner.reports.index')->with('error', 'Failed to delete report');
+            }
+        }
+    }
     public function doSort($column){
         if($this->sortColumn === $column){
             $this->sortDirection = ($this->sortDirection === 'ASC')? 'DESC':'ASC';
@@ -74,6 +105,7 @@ class ReportTable extends Component
                 'apartment.room_number',
                 'reports.created_at as date'
             )
+            ->whereNull('reports.deleted_at')
             ->orderByRaw("CASE WHEN reports.created_at = 'Solved' THEN 1 ELSE 0 END")
             ->orderBy($this->sortColumn, $this->sortDirection);
         // Filter based on the search search
@@ -90,7 +122,6 @@ class ReportTable extends Component
 
         $reports = $query->paginate($this->perPage);
 
-        return view('livewire.admin.report-table', compact('reports'));
         if (auth()->user()->role === 'admin') {
             return view('livewire.admin.report-table', compact('reports'));
 

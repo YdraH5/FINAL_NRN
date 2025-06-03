@@ -38,11 +38,6 @@
                     <h3 class="text-base font-semibold text-center text-gray-700">Rental Fee Earnings</h3>
                     <img src="{{ $rentalChartUrl }}" alt="Rental Fee Earnings Chart" class="w-full h-auto mx-auto">
                 </div>
-            
-                <div class="chart-container w-full md:w-1/2 lg:w-1/3 bg-white p-4 rounded-lg shadow-md">
-                    <h3 class="text-base font-semibold text-center text-gray-700">Reservation Fee Earnings</h3>
-                    <img src="{{ $reservationChartUrl }}" alt="Reservation Fee Earnings Chart" class="w-full h-auto mx-auto">
-                </div>
             </div>   
              <!-- Prepared By Section -->
              <div class="mt-10 border-t pt-4">

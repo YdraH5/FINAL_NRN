@@ -225,7 +225,16 @@ class ApartmentTable extends Component
 
             // Reset the form values
             $this->reset();
+                     // Conditionally render the correct view based on user role
+        if (auth()->user()->role === 'admin') {
             return redirect()->route('admin.apartment.index')->with('success', 'Adding renter successful.');
+               
+        } elseif (auth()->user()->role === 'owner') {
+            return redirect()->route('owner.apartment.index')->with('success', 'Adding renter successful.');
+        } else {
+            // Handle if user doesn't have the right role
+            abort(403, 'Unauthorized action.');
+        }
 
         } catch (\Exception $e) {
             // Rollback the transaction if something fails

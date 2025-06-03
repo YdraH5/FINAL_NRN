@@ -97,6 +97,58 @@
             </x-nav-link>
           </div>
         </li>
+        <!-- Settings Dropdown -->
+        <li class="mb-4">
+          <div x-data="{ open: false }" class="relative">
+            <!-- Dropdown Trigger -->
+            <button 
+              @click="open = !open" 
+              class="flex items-center justify-between w-full px-4 py-2 text-white rounded-md hover:bg-gray-700 focus:outline-none transition duration-300">
+              <span class="flex items-center">
+                @include('components.settings-icon') <!-- Include your settings icon component -->
+                <span class="ms-2 font-semibold">Settings</span>
+              </span>
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                class="w-5 h-5 transform transition-transform duration-300" 
+                :class="{'rotate-180': open}" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor" 
+                stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <!-- Dropdown Menu -->
+            <div 
+              x-show="open" 
+              x-collapse 
+              x-cloak
+              class="mt-2 bg-[#212529] text-white shadow-lg rounded-md overflow-hidden">
+              <x-nav-link 
+                wire:navigate 
+                :href="route('owner.nearby-establishment.index')" 
+                :active="request()->routeIs('owner.nearby-establishment.index')" 
+                class="block px-4 py-2">
+                {{ __('Nearby Establishments') }}
+              </x-nav-link>
+              <x-nav-link 
+                wire:navigate 
+                :href="route('owner.landing_page.index')" 
+                :active="request()->routeIs('owner.landing_page.index')" 
+                class="block px-4 py-2">
+                {{ __('Landing Page') }}
+              </x-nav-link>
+              <x-nav-link 
+                wire:navigate 
+                :href="route('owner.logs.index')" 
+                :active="request()->routeIs('owner.logs.index')" 
+                class="block px-4 py-2 ">
+                {{ __('Activity Logs') }}
+              </x-nav-link>
+            </div>
+          </div>
+        </li>
       </ul>
         <!-- Footer -->
       <footer class="p-1 bg-[#212529] text-gray-400 border-t border-gray-600">

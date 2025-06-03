@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Payment;
 use App\Models\Appartment;
+use App\Models\Reservation;
 use App\Models\User;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,8 @@ use Carbon\Carbon;
 class ReserveTable extends Component
 {
     use WithPagination;
-
+    public $isApprove = false;
+    public $isReject = false;
     public $modal = false;
     public $search = '';
     public $currentReceipt;
@@ -26,12 +28,14 @@ class ReserveTable extends Component
     public $sortDirection = "ASC";
     public $sortColumn = "user_name";
     public $perPage = 10;
-
+    public $approved_id;
+    public $rejected_id;
     // Summary properties
     public $totalReservations;
     public $approvedCount;
     public $pendingCount;
     public $rejectedCount;
+    public $showConfirmApproval = false;
 
     public function mount()
     {
@@ -96,78 +100,43 @@ class ReserveTable extends Component
         $this->id = null;
         $this->reset(['currentReceipt', 'currentStatus', 'id']); // Reset specific property
     }
-
-    public function approve($id)
-    {
-        // Count available apartments
-        $available = DB::table('apartment')
-            ->where('category_id', $this->categ_id)
-            ->whereIn('status', ['Available', 'Under Review'])  // Use whereIn for multiple statuses
-            ->count();
-        if ($available > 0) {
-            // Retrieve the specific payment record
-            $payment = Payment::where('reservation_id', $id)->first();
-
-            // Update the status of the payment record
-            $payment->update(['status' => 'paid']);
-
-            // Update user role
-            User::where('id', $payment->user_id)
-                ->update(['role' => 'reserve']);
-
-            // Update apartment status
-            Appartment::where('id', $payment->apartment_id)
-                ->update(['status' => 'Reserved',
-                    'renter_id' => $payment->user_id]);
-
-            // Retrieve user information
-            $user = DB::table('users')->where('id', $payment->user_id)->first();
-            session()->flash('success', 'The reservation has been approved'); // Set the success flash message
-
-            // Prepare email data
-            $dataemail = [
-                'name' => $user->name,
-                'payment' => $payment->amount,
-            ];
-            // Send email
-            Mail::to($user->email)->send(new ReservationSuccess($dataemail));
-            $this->modal = true;
-        }
+    public function approve($id){
+        $this->isApprove = true;
+        $this->approved_id = $id;
     }
-
-    public function reject($id)
-    {
-        // Retrieve the specific payment record
-        $payment = Payment::where('reservation_id', $id)->first();
-
-        if ($payment) {
-            // Update the status of the payment record to 'rejected'
-            $payment->update(['status' => 'Rejected']);
-
-            // Update the apartment status to 'Available' and remove the renter_id
-            Appartment::where('id', $payment->apartment_id)
+    public function approved()
+        {
+            // Find the reservation
+            $reservation = Reservation::findOrFail($this->approved_id);
+            
+            // Update the apartment status to 'Reserved'
+            Appartment::where('id', $reservation->apartment_id)
                 ->update([
-                    'status' => 'Available',
-                    'renter_id' => null // Clear the renter_id since the reservation is rejected
+                    'status' => 'Reserved',
+                    'renter_id' => $reservation->user_id
                 ]);
-
-            // Retrieve user information
-            $user = DB::table('users')->where('id', $payment->user_id)->first();
-
-            // Set the flash message to indicate rejection
-            session()->flash('error', 'The reservation has been rejected');
-
-            // Prepare email data
-            $dataemail = [
-                'name' => $user->name,
-                'payment' => $payment->amount,
-            ];
-
-            // Send email notification to user about the rejection
-
-            $this->modal = true;
-        } else {
-            session()->flash('error', 'Payment record not found.');
+            
+            // Update the reservation status to 'Approved'
+            $reservation->update(['status' => 'Approved']);
+            
+            // Flash success message
+            return redirect()->route('owner.reserve.index')->with('success', 'Payment Rejected successfully.');
+        }
+    public function reject($id){
+        $this->isReject = true;
+        $this->rejected_id = $id;
+    }  
+    public function rejected()
+    {
+        {
+            // Find the reservation
+            $reservation = Reservation::findOrFail($this->rejected_id);
+            
+            // Update the reservation status to 'Approved'
+            $reservation->update(['status' => 'Rejected']);
+            
+            // Flash success message
+            return redirect()->route('owner.reserve.index')->with('success', 'Payment Rejected successfully.');
         }
     }
 

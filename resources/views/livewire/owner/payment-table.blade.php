@@ -37,11 +37,7 @@
                         <h3 class="text-base font-semibold text-center text-gray-700">Rental Fee Earnings</h3>
                         <img src="{{ $rentalChartUrl }}" alt="Rental Fee Earnings Chart" class="w-full h-auto mx-auto">
                     </div>
-                
-                    <div class="chart-container w-full md:w-1/2 lg:w-1/3 bg-white p-4 rounded-lg shadow-md">
-                        <h3 class="text-base font-semibold text-center text-gray-700">Reservation Fee Earnings</h3>
-                        <img src="{{ $reservationChartUrl }}" alt="Reservation Fee Earnings Chart" class="w-full h-auto mx-auto">
-                    </div>
+
                 </div>   
                  <!-- Prepared By Section -->
                  <div class="mt-10 border-t pt-4">
@@ -103,6 +99,7 @@
                                 Status
                                 <x-datatable-item :sortColumn="$sortColumn" :sortDirection="$sortDirection" columnName="status" />
                             </th>    
+                            <th class="no-print py-3 px-4 text-center border-b border-indigo-600">Actions</th>  
                         </tr>
                     </thead>
                     <tbody>
@@ -119,11 +116,72 @@
                             <td class="py-3 px-4 text-center border-b border-gray-300 text-green-500">{{ $payment->status }}</td>
                             @elseif($payment->status === 'pending')
                             <td class="py-3 px-4 text-center border-b border-gray-300 text-yellow-500">{{ $payment->status }}</td>
+                             @elseif($payment->status === 'Rejected')
+                            <td class="py-3 px-4 text-center border-b border-gray-300 text-yellow-500">{{ $payment->status }}</td>
                             @endif
+                             <td class="no-print py-3 px-4 text-center border-b border-gray-300">
+                                <div class="flex justify-center gap-1"> 
+                                    <button wire:click="showReceipt('{{ asset($payment->receipt) }}','{{$payment->id}}','{{$payment->status}}')"
+                                        x-data x-on:click="$dispatch('open-modal',{name:'view-receipt'})"
+                                        @if($payment->payment_method === 'stripe'||$payment->status === 'unpaid') disabled title="disabled" @endif
+                                        >
+                                        @include('components.view-icon')
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                         @endforeach   
                     </tbody>
-                </table>       
+                </table>   
+                <x-modal name="view-receipt" title="Receipt">
+                    <x-slot name="body">
+                        <div class="p-4 flex flex-col items-center">
+                            @if($currentReceipt)
+                            <img src="{{ $currentReceipt }}" alt="NO RECEIPT TO SHOW" style="max-height: 400px; max-width: 100%;">
+                            @endif
+                            <div class="flex justify-end py-2">
+                                @if($currentStatus === 'paid' || $currentStatus === 'pending')
+                                <button wire:click="reject({{$payment_id}})" 
+                                    x-on:click="$dispatch('close-modal',{name:'view-receipt'})" 
+                                    type="button"
+                                    class="bg-red-400 hover:bg-red-600 text-white font-bold py-2 px-4 rounded mr-4"
+                                    wire:loading.attr="disabled"
+                                    wire:target="reject">
+                                    <span wire:loading.class.remove="hidden" wire:target="reject" class="hidden">
+                                        <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Processing
+                                    </span>
+                                    <span wire:loading.class.add="hidden" wire:target="reject">
+                                        Reject
+                                    </span>
+                                </button>
+                                @endif
+                                
+                                @if($currentStatus === 'pending' || $currentStatus === 'Rejected')
+                                <button type="button"
+                                    class="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded"
+                                    wire:click="approve({{ $payment_id }})"
+                                    wire:loading.attr="disabled"
+                                    wire:target="approve">
+                                    <span wire:loading.class.remove="hidden" wire:target="approve" class="hidden">
+                                        <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Processing
+                                    </span>
+                                    <span wire:loading.class.add="hidden" wire:target="approve">
+                                        Approve
+                                    </span>
+                                </button>
+                                @endif
+                            </div>
+                        </div>
+                    </x-slot>
+                </x-modal>    
             </div>
             <div class="py-4 no-print">
                 <div class="flex items-center mb-3">

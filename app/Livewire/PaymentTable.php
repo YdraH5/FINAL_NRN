@@ -90,8 +90,16 @@ class PaymentTable extends Component
         // Close the modal after processing
         $this->dispatch('close-modal', name: 'view-receipt');
         
-        session()->flash('success', 'Payment Approved');
-        return redirect()->route('admin.payments.index');
+        // Conditionally render the correct view based on user role
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.payments.index')->with('success', 'Payment Accepted.');
+               
+        } elseif (auth()->user()->role === 'owner') {
+            return redirect()->route('owner.payments.index')->with('success', 'Payment Accepted.');
+        } else {
+            // Handle if user doesn't have the right role
+            abort(403, 'Unauthorized action.');
+        }
     }
     private function updatePaymentAndDueDate($payment_id, $status)
     {
@@ -145,8 +153,16 @@ class PaymentTable extends Component
             User::where('id', $payment->user_id)
                 ->update(['role' => 'tenant']); // or whatever default role
         }
-        
-        session()->flash('success', 'Payment Rejected');
+        // Conditionally render the correct view based on user role
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.payments.index')->with('success', 'Payment Rejected successfully.');
+               
+        } elseif (auth()->user()->role === 'owner') {
+            return redirect()->route('owner.payments.index')->with('success', 'Payment Rejected successfully.');
+        } else {
+            // Handle if user doesn't have the right role
+            abort(403, 'Unauthorized action.');
+        }
     }
     public function send()
     {
@@ -287,52 +303,12 @@ $rentalChartUrl = 'https://quickchart.io/chart?c=' . urlencode(json_encode([
         ],
     ],
 ])) . '&w=400&h=300';
-
-// Apply similar changes to the reservation chart URL
-$reservationChartUrl = 'https://quickchart.io/chart?c=' . urlencode(json_encode([
-    'type' => 'bar',
-    'data' => [
-        'labels' => ['Last Month', 'This Month'],
-        'datasets' => [
-            [
-                'label' => 'Reservation Fee Earnings (₱)',
-                'data' => [$lastMonthReservationEarnings, $currentMonthReservationEarnings],
-                'backgroundColor' => ['rgba(153, 102, 255, 0.6)', 'rgba(255, 159, 64, 0.6)'],
-                'borderColor' => ['rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)'],
-                'borderWidth' => 1,
-            ],
-        ],
-    ],
-    'options' => [
-        'scales' => [
-            'y' => [
-                'beginAtZero' => true,
-                'max' => $adjustedMaxValue, // Set adjusted max value with extra margin
-            ],
-        ],
-        'plugins' => [
-            'datalabels' => [
-                'display' => true,
-                'anchor' => 'end',
-                'align' => 'end',
-                'color' => '#333333',
-                'font' => [
-                    'size' => 14,
-                    'weight' => 'bold',
-                ],
-                'formatter' => function($value, $context) {
-                    return '₱' . number_format($value, 2);
-                },
-            ],
-        ],
-    ],
-])) . '&w=400&h=300';
         // Conditionally render the correct view based on user role
         if (auth()->user()->role === 'admin') {
-            return view('livewire.admin.payment-table', compact('payments', 'rentalChartUrl', 'reservationChartUrl'));
+            return view('livewire.admin.payment-table', compact('payments', 'rentalChartUrl'));
 
         } elseif (auth()->user()->role === 'owner') {
-            return view('livewire.owner.payment-table', compact('payments', 'rentalChartUrl', 'reservationChartUrl'));
+            return view('livewire.owner.payment-table', compact('payments', 'rentalChartUrl'));
 
         } else {
             // Handle if user doesn't have the right role

@@ -81,11 +81,11 @@ class LandingSeting extends Component
         // Clear the temporary file upload property
         $this->reset('new_gcash_qr_image');
         
-        return redirect()->route('admin.landing_page.index')->with('success','Landing page updated successfully!');
+        return redirect()->route('owner.landing_page.index')->with('success','Landing page updated successfully!');
     }
 
     public function render()
     {
-        return view('livewire.admin.landing-seting');
+        return view('livewire.owner.landing-seting');
     }
 }
