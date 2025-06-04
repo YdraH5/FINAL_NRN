@@ -8,42 +8,45 @@ use App\Models\Appartment;
 
 class AnnouncementPosted extends Component
 {
+    public $search = '';
+
     public function render()
-{
-    // Find the apartment based on the logged-in user's ID
-    $currentApartment = Appartment::where('renter_id', auth()->user()->id)->first(); 
-    
-    // Ensure the apartment exists before continuing
-    if (!$currentApartment) {
-        // Handle case where the apartment is not found (e.g., return an error or empty response)
+    {
+        // Find the apartment based on the logged-in user's ID
+        $currentApartment = Appartment::where('renter_id', auth()->id())->first(); 
+        
+        if (!$currentApartment) {
+            return view('livewire.renter.announcement-posted', [
+                'announcements' => collect(),
+            ]);
+        }
+
+        // Base query with status and category filtering
+        $announcementsQuery = Announcement::where('status', 'active')
+            ->where(function($query) use ($currentApartment) {
+                $query->where('category', $currentApartment->category_id)
+                      ->orWhere('category', 'all');
+            });
+
+        // Apply search filter if search term exists
+        if ($this->search) {
+            $searchTerm = '%'.strtolower($this->search).'%';
+            $announcementsQuery->where(function($query) use ($searchTerm) {
+                $query->whereRaw('LOWER(title) LIKE ?', [$searchTerm])
+                      ->orWhereRaw('LOWER(content) LIKE ?', [$searchTerm])
+                      ->orWhereRaw('LOWER(priority) LIKE ?', [$searchTerm]);
+            });
+        }
+
+        // Final query with ordering
+        $announcements = $announcementsQuery
+            ->orderBy('start_date', 'desc')
+            ->get();
+
         return view('livewire.renter.announcement-posted', [
-            'announcements' => collect(), // Return an empty collection if no apartment is found
+            'announcements' => $announcements
         ]);
     }
-
-    // Get the announcements matching the category of the current apartment
-    $announcementsQuery = Announcement::where('status', 'active')
-        ->orderBy('start_date', 'desc');
-    
-    // If the category is not 'all', filter by the current apartment's category
-    if ($currentApartment->category_id !== null) {
-        $announcementsQuery->where(function ($query) use ($currentApartment) {
-            $query->where('category', $currentApartment->category_id)
-                ->orWhere('category', 'all'); // Include announcements with 'all' category
-        });
-    } else {
-        // If no category is set for the apartment, show all announcements with 'all' category
-        $announcementsQuery->where('category', 'all');
-    }
-
-    // Get the filtered announcements
-    $announcements = $announcementsQuery->get();
-    
-    // Return the view with the announcements
-    return view('livewire.renter.announcement-posted', [
-        'announcements' => $announcements,
-    ]);
-}
 
     
 }

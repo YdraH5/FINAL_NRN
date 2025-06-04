@@ -206,7 +206,9 @@ Route::get('/reserve/{reservation}/cancel', [ReservationController::class, 'canc
 Route::get('/payment-success', [ReservationController::class, 'paymentSuccess'])->name('reserve.payment_success')->middleware(['auth', 'verified']);
 });
 
-
+Route::get('/owner/verify', function () {
+    return view('/owner/verify');
+})->name('owner.verify.index');
 // first page to see when url of the page is executed
 Route::get('/', function () {
     return view('/visitors/index');

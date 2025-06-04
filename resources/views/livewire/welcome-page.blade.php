@@ -232,13 +232,14 @@
                             <div id="default-carousel-{{$category->category_id}}" class="relative" data-carousel="static">
                                 <div class="overflow-hidden relative h-64 md:h-72 lg:h-80">
                                     @foreach ($images[$category->category_id] as $image)
-                                    <div class="hidden duration-300 ease-in-out" data-carousel-item>
-                                        <img src="{{ asset($image->image) }}" 
-                                            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                                            alt="{{ $category->category_name }} apartment image"
-                                            loading="lazy"
-                                            width="600"
-                                            height="400">
+                                    <!-- Image Container with Fixed Aspect Ratio -->
+                                    <div class="w-full h-ful overflow-hidden flex items-center justify-center bg-gray-100">
+                                        @if($images[$category->category_id]->first())
+                                        <img src="{{ asset($images[$category->category_id]->first()->image) }}" 
+                                            class="object-contain h-full w-full p-2"
+                                            alt="{{ $category->category_name }}"
+                                            loading="lazy">
+                                        @endif
                                     </div>
                                     @endforeach
                                 </div>

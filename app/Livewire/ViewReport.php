@@ -11,8 +11,10 @@ class ViewReport extends Component
     use WithPagination;
     public $isViewing= false;
     public $id;
-    public $search;
     public $viewReport;
+    public $sortDirection = "DESC"; // Default to newest first
+    public $sortColumn = "created_at";
+    public $search = '';
     #[Validate('required|min:5|max:50')] 
     public $status;
 
@@ -37,13 +39,42 @@ class ViewReport extends Component
         $this->description = $this->viewReport->description;
         $this->date = $this->viewReport->created_at;
     }
+
+
     public function render()
     {
-        $user = Auth::user();
-
-        $report =Report::where('user_id', $user->id)->get();
+        $user = auth()->user();
+        
+        $query = Report::where('user_id', $user->id);
+        
+        // Apply search
+        if (!empty($this->search)) {
+            $query->where(function($q) {
+                $q->where('id', 'like', '%'.$this->search.'%')
+                  ->orWhere('report_category', 'like', '%'.$this->search.'%')
+                  ->orWhere('description', 'like', '%'.$this->search.'%')
+                  ->orWhere('status', 'like', '%'.$this->search.'%')
+                  ->orWhere('created_at', 'like', '%'.$this->search.'%');
+            });
+        }
+        
+        // Apply sorting
+        $query->orderBy($this->sortColumn, $this->sortDirection);
+        
+        $reports = $query->get();
+        
         return view('livewire.renter.view-report', [
-            'reports' => $report,
+            'reports' => $reports
         ]);
+    }
+
+    public function doSort($column)
+    {
+        if ($this->sortColumn === $column) {
+            $this->sortDirection = ($this->sortDirection === 'ASC') ? 'DESC' : 'ASC';
+            return;
+        }
+        $this->sortColumn = $column;
+        $this->sortDirection = 'ASC';
     }
 }
