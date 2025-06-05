@@ -100,11 +100,11 @@
                                             
                                             <!-- Preview Section -->
                                             <div class="mt-4">
-                                            @if ($image_url && method_exists($image_url, 'temporaryUrl'))
-                                                <img src="{{ $image_url->temporaryUrl() }}" alt="Preview">
-                                            @elseif ($image_url && is_string($image_url))
-                                                <img src="{{ asset('storage/' . $image_url) }}" alt="Preview">
-                                            @endif
+                                                @if ($image_url && method_exists($image_url, 'temporaryUrl'))
+                                                    <img src="{{ $image_url->temporaryUrl() }}" alt="Preview" class="w-20 h-20 object-cover">
+                                                @else
+                                                    <img src="{{ asset('storage/' . $establishment->image_url) }}" alt="Current Image" class="w-20 h-20 object-cover">
+                                                @endif
                                             </div>
                                         </div>
 
