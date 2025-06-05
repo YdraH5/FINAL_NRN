@@ -28,11 +28,31 @@ class NearbyForm extends Component
             'distance' => $this->distance,
             'image_url' => $imagePath,
         ]);
+                
+        if (auth()->user()->role === 'admin') {
         return redirect()->route('admin.nearby-establishment.index')->with('success', 'Uploading Nearby Establishment Success');
+
+        } elseif (auth()->user()->role === 'owner') {
+        return redirect()->route('owner.nearby-establishment.index')->with('success', 'Uploading Nearby Establishment Success');
+
+        } else {
+            // Handle if user doesn't have the right role
+            abort(403, 'Unauthorized action.');
+        }
 
     }
     public function render()
     {
-        return view('livewire.admin.nearby-form');
+        
+        if (auth()->user()->role === 'admin') {
+            return view('livewire.admin.nearby-form');
+
+        } elseif (auth()->user()->role === 'owner') {
+            return view('livewire.owner.nearby-form');
+
+        } else {
+            // Handle if user doesn't have the right role
+            abort(403, 'Unauthorized action.');
+        }
     }
 }
