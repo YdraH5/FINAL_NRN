@@ -143,7 +143,7 @@ Route::group(['middleware' => ['auth','verified']], function () {
         })->name('owner.occupants.index');
                 // ROUTE TO ANNOUNCEMENT
         Route::get('/owner/announcement', function () {
-            return view('/owner/announcement');
+            return view('/owner/announcements');
         })->name('owner.announcement.index');
 
         // ROUTE TO NEARBY ESTABLISHMENTS

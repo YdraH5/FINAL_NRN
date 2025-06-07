@@ -102,6 +102,7 @@ class ViewDetail extends Component
                 'buildings.name as building_name' // Added building name
             )
             ->where('apartment.category_id', $this->categoryId)
+            ->whereNull('apartment.deleted_at')
             ->where('apartment.status', 'Available');
        
         if ($this->floorNumber !== 'any') {

@@ -2,7 +2,7 @@
     <x-modal name="add-establishment" title="Add Nearby Establishment">
         <x-slot:body>
             <!-- Form -->
-            <form id="establishmentForm" class="space-y-4" wire:submit.prevent="save">
+            <form id="establishmentForm" class="space-y-4" wire:submit.prevent="save" enctype="multipart/form-data">
                 <div class="lg:grid lg:grid-cols-2 lg:gap-6">
                     <div>
                         <label class="block font-medium opacity-70">Name</label>

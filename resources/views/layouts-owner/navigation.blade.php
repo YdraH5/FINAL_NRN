@@ -97,6 +97,15 @@
             </x-nav-link>
           </div>
         </li>
+        <li class="mb-4">
+          <div class="hidden sm:-my-px sm:ms-10 sm:flex hover:text-black"> 
+            <!-- Payments Icon -->
+            @include('components.megaphone-icon') 
+            <x-nav-link wire:navigate :href="route('owner.announcement.index')" :active="request()->routeIs('owner.announcement.index')">
+              {{ __('Announcement') }}
+            </x-nav-link>
+          </div>
+        </li>
         <!-- Settings Dropdown -->
         <li class="mb-4">
           <div x-data="{ open: false }" class="relative">

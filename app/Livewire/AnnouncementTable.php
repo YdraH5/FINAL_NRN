@@ -18,7 +18,16 @@ class AnnouncementTable extends Component
     public function deleted(){
         $delete = Announcement::find($this->deleteId)->delete();
         if($delete){
-            return redirect()->route('admin.announcement.index')->with('success', 'Announcement deleted successfully.');
+            // Reset the component state
+            if (auth()->user()->role === 'admin') {
+                return redirect()->route('admin.announcement.index')->with('success', 'Announcement deleted successfully.');  
+
+            } elseif (auth()->user()->role === 'owner') {
+                return redirect()->route('owner.announcement.index')->with('success', 'Announcement deleted successfully.');  
+            } else {
+                // Handle if user doesn't have the right role
+                abort(403, 'Unauthorized action.');
+            }
         }
         $this->isDeleting = false;
     }
@@ -59,16 +68,36 @@ class AnnouncementTable extends Component
         $this->isEditing = false;
         $this->reset();
         // Reset the component state
-        return redirect()->route('admin.announcement.index')->with('success', 'Announcement updated successfully.');  
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.announcement.index')->with('success', 'Announcement updated successfully.');  
+
+        } elseif (auth()->user()->role === 'owner') {
+            return redirect()->route('owner.announcement.index')->with('success', 'Announcement updated successfully.');  
+        } else {
+            // Handle if user doesn't have the right role
+            abort(403, 'Unauthorized action.');
+        }
     }
 
     public function render()
     {
         $categories = Category::whereNull('deleted_at')->get();
         $announcements = Announcement::whereNull('deleted_at')->get();
-        return view('livewire.admin.announcement-table', [
-            'announcements' => $announcements,
-            'categories' => $categories,
-        ]);
+
+                 // Conditionally render the correct view based on user role
+        if (auth()->user()->role === 'admin') {
+            return view('livewire.admin.announcement-table', [
+                'announcements' => $announcements,
+                'categories' => $categories,
+            ]);
+        } elseif (auth()->user()->role === 'owner') {
+            return view('livewire.owner.announcement-table', [
+                'announcements' => $announcements,
+                'categories' => $categories,
+            ]);
+        } else {
+            // Handle if user doesn't have the right role
+            abort(403, 'Unauthorized action.');
+        }
     }
 }

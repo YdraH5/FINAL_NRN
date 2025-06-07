@@ -15,4 +15,4 @@
     </div>
     
     @endsection
-<x-owner-layout>
+</x-owner-layout>
