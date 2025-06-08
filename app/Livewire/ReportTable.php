@@ -26,32 +26,7 @@ class ReportTable extends Component
         $this->isDeleting = true;
         $this->deleteId = $id;
     }
-    // public function deleted(){
-    //     $delete = Category::find($this->deleteId)->delete();
-    //     if($delete){
-    //         $this->reset();
-    //         return redirect()->route('owner.categories.index')->with('success','Category deleted successfully.');
-    //     }
-    //     $this->isDeleting=false;
-    // }
-    public function deleted(){
-        try {
-            $report = Report::findOrFail($this->id);
-            $report->delete();
-            
-            if (auth()->user()->role === 'admin') {
-                return redirect()->route('admin.reports.index')->with('success', 'Report deleted successfully');
-            } elseif (auth()->user()->role === 'owner') {
-                return redirect()->route('owner.reports.index')->with('success', 'Report deleted successfully');
-            }
-        } catch (\Exception $e) {
-            if (auth()->user()->role === 'admin') {
-                return redirect()->route('admin.reports.index')->with('error', 'Failed to delete report');
-            } elseif (auth()->user()->role === 'owner') {
-                return redirect()->route('owner.reports.index')->with('error', 'Failed to delete report');
-            }
-        }
-    }
+
     public function doSort($column){
         if($this->sortColumn === $column){
             $this->sortDirection = ($this->sortDirection === 'ASC')? 'DESC':'ASC';

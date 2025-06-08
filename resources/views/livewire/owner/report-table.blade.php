@@ -66,7 +66,83 @@
             <tbody>
                 @foreach($reports as $report)
                 <tr class="hover:bg-indigo-100 ">
-                           
+                    @if($report->is_anonymous === "false")
+                        <td class="py-3 px-4 text-center border-b border-gray-300">{{$report->name}}</td>
+                        <td class="py-3 px-4 text-center border-b border-gray-300">{{$report->building_name}}-{{$report->room_number}}</td>
+                    @else
+                        <td class="py-3 px-4 text-center border-b border-gray-300">Anonymous</td>
+                        <td class="py-3 px-4 text-center border-b border-gray-300">Anonymous</td>
+                    @endif
+                    <td class="py-3 px-4 text-center border-b border-gray-300">{{$report->report_category}}</td>
+                    <td class="py-3 px-4 text-center border-b border-gray-300">{{$report->description}}</td>
+                    @if($report->status === 'Fixed')
+                    <td class="py-3 px-4 text-center border-b border-gray-300 bg-green-100">{{$report->status}}</td>
+                        @else
+                        <td class="py-3 px-4 text-center border-b border-gray-300 text-yellow-800">{{$report->status}}</td>
+                        @endif
+                    <td class="py-3 text-center border-b border-gray-300">{{ \Carbon\Carbon::parse($report->date)->diffForHumans() }}</td>
+                    <td class="py-3 px-4 text-center border-b border-gray-300">
+                        <x-modal name="solve-report" title="Solve Report">
+                            <x-slot:body>
+                                <form id="modalForm" class="space-y-4 "wire:submit.prevent="action">
+                                    <div>
+                                        <input type="hidden"wire:model="status">
+                                        <div>
+                                            <label class="block font-medium opacity-70">Status</label>
+                                            <select wire:model="status" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
+                                                <option value="" disabled selected hidden>Status</option>
+                                                <option value="Pending">Pending</option>
+                                                <option value="Sent Labor">Sent Labor</option>
+                                                <option value="Ongoing">Ongoing</option>
+                                                <option value="Fixed">Fixed</option>
+                                            </select>
+                                            @error('status') <span class="error text-red-900">{{ $message }}</span> @enderror
+                                        </div> 
+                                    </div>
+                                    <div class="flex items-center justify-between py-8">
+                                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button>
+                                        <button  x-on:click="$dispatch('close-modal',{name:'add-apartment'})" type="button" class="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">Close</button>
+                                    </div>
+                                </form>
+                            </x-slot:body>
+                        </x-modal>
+                        <div class="btn-group flex justify-center">
+                            <button
+                            x-data="{ id: {{$report->id}} }"
+                            x-on:click="$wire.set('id', id); $dispatch('open-modal', { name: 'solve-report' })"
+                            wire:click="edit(id)"
+                            type="button"
+                            class="px-3 py-2.5 ">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="blue" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" />
+                            </svg>
+                            </button>
+                            <button
+                                x-data="{ id: {{$report->id}} }"
+                                x-on:click="$wire.set('id', id); $dispatch('open-modal', { name: 'delete-report' })"
+                                wire:click="delete(id)"
+                                title="delete"
+                                type="button"
+                                >
+                                    @include('buttons.delete')
+                            </button>
+                             @if ($isDeleting)
+                            <x-modal name="delete-report" title="Delete Complain">
+                                <x-slot name="body">
+                                    <div class="p-4">
+                                        <p class="text-lg font-semibold mb-4">Are you sure you want to delete this Complain?</p>
+                                        <p class="text-gray-600 mb-8">This action cannot be undone. Please confirm.</p>
+                                        
+                                        <div class="flex justify-end">
+                                            <button type="button" class="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded mr-4" x-on:click="$dispatch('close-modal',{name:'delete-category'})">Cancel</button>
+                                            <button type="submit" class="bg-red-600 hover:bg-red-800 text-white font-bold py-2 px-4 rounded" wire:click="deleted">Delete</button>
+                                        </div>
+                                    </div>
+                                </x-slot>
+                            </x-modal>
+                            @endif  
+                        </div>
+                    </td>           
                 </tr>
                 @endforeach   
         </tbody>
