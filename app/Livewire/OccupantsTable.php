@@ -30,6 +30,14 @@ class OccupantsTable extends Component
     public $modal = false;
     public $due_id;
     public $open = false;
+    public $selectedApartmentId;
+
+        
+    public function confirmOut($apartmentId)
+    {
+        $this->selectedApartmentId = $apartmentId;
+        $this->dispatch('open-modal', name: 'out-modal');
+    }
     public function doSort($column){
         if($this->sortColumn === $column){
             $this->sortDirection = ($this->sortDirection === 'ASC')? 'DESC':'ASC';
@@ -45,25 +53,26 @@ class OccupantsTable extends Component
     public function isSend(){
         $this->isSend = true;
     }
-    public function out($apartment_id){
-        $apartment = Appartment::where('id',$apartment_id)->first();
+    public function out()
+    {
+        $apartment = Appartment::where('id', $this->selectedApartmentId)->first();
 
-        Appartment::where('id', $apartment_id)
+        Appartment::where('id', $this->selectedApartmentId)
             ->update([
                 'status' => 'Available',
-                'renter_id' => null // Clear the renter_id since the reservation is rejected
+                'renter_id' => null
             ]);
-        User::where('id',$apartment->renter_id)
-        ->update(['role'=>'departed']);
+            
+        User::where('id', $apartment->renter_id)
+            ->update(['role' => null]);
+            
         if (auth()->user()->role === 'admin') {
-           return redirect()->route('admin.occupants.index')->with('success', 'Renter removed to the apartment successfully');
+            return redirect()->route('admin.occupants.index')->with('success', 'Renter removed from the apartment successfully');
         } elseif (auth()->user()->role === 'owner') {
-           return redirect()->route('owner.occupants.index')->with('success', 'Renter removed to the apartment successfully');
+            return redirect()->route('owner.occupants.index')->with('success', 'Renter removed from the apartment successfully');
         } else {
-            // Handle if user doesn't have the right role
             abort(403, 'Unauthorized action.');
         }
-
     }
     public function send()
     {
@@ -199,7 +208,6 @@ class OccupantsTable extends Component
             'users.id as user_id',
             'users.phone_number',
             'users.email',
-            'apartment.id',
             'categories.name as categ_name',
             'apartment.room_number',
             'apartment.id as apartment_id',

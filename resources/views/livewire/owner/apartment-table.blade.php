@@ -190,23 +190,14 @@
                         <td class="no-print py-3 px-4 text-center border-b border-gray-300">
                             <div class="flex justify-center gap-1"> 
                                 
-                            <button
-                                x-data="{ id: {{$apartments->id}} }"
-                                x-on:click="$wire.set('id', id); $dispatch('open-modal', { name: 'edit-apartment' })"
-                                wire:click="edit(id)"
-                                title ="Edit" 
-                                type="button"
-                                class="my-2">
-                            @include('buttons.edit')
-                            </button>
+
                              <button
-                             x-data="{ id: {{$apartments->id}} }"
-                             x-data x-on:click="$wire.set('id', id); $dispatch('open-modal',{name:'add-renter'})"
-                             wire:click="saveApartment(id)"
-                             @if($apartments->status !== 'Available') disabled title ="disabled" 
-                             @else title ="Add renter" 
-                             @endif
-                             >
+                                x-data="{ id: {{$apartments->id}} }"
+                                x-data x-on:click="$wire.set('id', id); $dispatch('open-modal',{name:'add-renter'})"
+                                wire:click="saveApartment(id)"
+                                @if($apartments->status !== 'Available') disabled title ="disabled" 
+                                @else title ="Add renter" 
+                                @endif>
                              @include('components.add-renter')
                              </button>
                              <!-- modal for adding a renters to apartment when there is a walk in customer -->
@@ -280,7 +271,28 @@
                                     </form>
                                 </x-slot>
                             </x-modal>
-                            @if($isEditing)
+                           
+                            @if(!$apartments->renter_id)
+                            <button
+                                x-data="{ id: {{$apartments->id}} }"
+                                x-on:click="$wire.set('id', id); $dispatch('open-modal', { name: 'edit-apartment' })"
+                                wire:click="edit(id)"
+                                title ="Edit" 
+                                type="button"
+                                class="my-2">
+                            @include('buttons.edit')
+                            </button>
+                            <button
+                                x-data="{ id: {{$apartments->id}} }"
+                                x-on:click="$wire.set('id', id); $dispatch('open-modal', { name: 'delete-apartment' })"
+                                wire:click="delete(id)"
+                                title ="Delete" 
+                                type="button"
+                                class="my-2">
+                                @include('buttons.delete')
+                            </button>
+                            @endif
+                             @if($isEditing)
                             <x-modal name="edit-apartment" title="Edit Apartment">
                                 <x-slot:body>
                                         <!-- Form -->
@@ -339,17 +351,6 @@
                                 </x-slot:body>
                             </x-modal>
                              @endif
-                            @if(!$apartments->renter_id)
-                            <button
-                                x-data="{ id: {{$apartments->id}} }"
-                                x-on:click="$wire.set('id', id); $dispatch('open-modal', { name: 'delete-apartment' })"
-                                wire:click="delete(id)"
-                                title ="Delete" 
-                                type="button"
-                                class="my-2">
-                                @include('buttons.delete')
-                            </button>
-                            @endif
                             @if($isDeleting)
                             <x-modal name="delete-apartment" title="Delete Apartment">
                                 <x-slot name="body">
