@@ -62,7 +62,7 @@ class ReserveTable extends Component
             ->count();
 
         $this->rejectedCount = DB::table('reservations')
-            ->where('status', 'rejected')
+            ->where('status', 'Rejected')
             ->whereMonth('created_at', Carbon::now()->month)
             ->whereYear('created_at', Carbon::now()->year)
             ->count();
@@ -115,7 +115,10 @@ class ReserveTable extends Component
                     'status' => 'Reserved',
                     'renter_id' => $reservation->user_id
                 ]);
-            
+            User::where('id', $reservation->user_id)
+                ->update([
+                    'role' => 'reserve'
+                ]);
             // Update the reservation status to 'Approved'
             $reservation->update(['status' => 'Approved']);
             

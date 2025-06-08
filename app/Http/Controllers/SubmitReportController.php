@@ -28,6 +28,8 @@ public function create(Request $request) {
     $userId = $request->user()->id;
     $count = DB::table('reports')
         ->where('user_id', $userId)
+        ->where('status', '!=', 'Fixed')
+        ->whereNull('deleted_at')
         ->count();
 
     if ($count < 3) {

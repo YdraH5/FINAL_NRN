@@ -45,7 +45,10 @@
     @endphp
     
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-
+        <div class="bg-green-100 p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-medium text-green-600">Received</h3>
+            <p class="text-4xl font-bold">{{ $totalReservations }}</p>
+        </div>
         <div class="bg-green-100 p-6 rounded-lg shadow-md">
             <h3 class="text-lg font-medium text-green-600">Approved</h3>
             <p class="text-4xl font-bold">{{ $monthlyApproved }}</p>
@@ -56,7 +59,7 @@
         </div>
         <div class="bg-red-100 p-6 rounded-lg shadow-md">
             <h3 class="text-lg font-medium text-red-600">Rejected</h3>
-            <p class="text-4xl font-bold">{{ $monthlyRejected }}</p>
+            <p class="text-4xl font-bold">{{ $rejectedCount }}</p>
         </div>
     </div>
 
@@ -126,8 +129,8 @@
             <tbody>
         
                 @foreach($reservations->filter(function ($reservation) {
-                    return \Carbon\Carbon::parse($reservation->check_in)->isCurrentMonth() && 
-                           \Carbon\Carbon::parse($reservation->check_in)->isCurrentYear();
+                    return \Carbon\Carbon::parse($reservation->created_at)->isCurrentMonth() && 
+                           \Carbon\Carbon::parse($reservation->created_at)->isCurrentYear();
                 }) as $reservation)
                     <tr class="hover:bg-indigo-100">
                     <td class="py-3 px-4 text-center border-b border-gray-300">{{$reservation->user_name}}</td>
@@ -176,10 +179,10 @@
                             <x-datatable-item :sortColumn="$sortColumn" :sortDirection="$sortDirection" columnName="rental_period" />
                         </div>
                     </th>
-                    <th wire:click="doSort('status')" class="py-3 px-4 text-center border-b border-indigo-600 cursor-pointer">
+                    <th wire:click="doSort('reservation_status')" class="py-3 px-4 text-center border-b border-indigo-600 cursor-pointer">
                         <div class="inline-flex items-center justify-center">
                              Status
-                            <x-datatable-item :sortColumn="$sortColumn" :sortDirection="$sortDirection" columnName="status" />
+                            <x-datatable-item :sortColumn="$sortColumn" :sortDirection="$sortDirection" columnName="reservation_status" />
                         </div>
                     </th>
                     <th class="py-3 px-4 text-center border-b border-indigo-600">Actions</th>
@@ -221,8 +224,18 @@
             </tbody>
         </table>
     </div>
+    
     <!-- Pagination -->
     <div class="no-print py-4">
+        <div class="flex items-center mb-3">
+                    <label for="perPage" class="no-print mr-2 mt-2 text-sm font-medium text-gray-700">Per Page:</label>
+                    <select id="perPage" wire:model.live="perPage" class="no-print border border-gray-300 rounded px-2 py-1 h-8 w-20 text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="" disabled selected>Select</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
         <div class="mt-4">
             {{ $reservations->links() }}
         </div>

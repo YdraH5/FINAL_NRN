@@ -17,8 +17,8 @@ class ReportTable extends Component
     #[Validate('required|min:5|max:50')] 
     public $status = '';
     public $id;
-    public $sortDirection="ASC";
-    public $sortColumn ="name";
+    public $sortDirection="DESC";
+    public $sortColumn ="date";
     public $perPage = 10;
     public $deleteId;
     public $isDeleting = false;

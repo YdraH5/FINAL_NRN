@@ -51,7 +51,7 @@
     @if(Auth::user()->role === 'pending')
     <div class="min-h-screen flex flex-col justify-center items-center bg-gray-50">    
         <div class="bg-white p-4 md:p-8 rounded-lg shadow-lg w-11/12 md:w-3/4 lg:w-1/2">
-            <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800 text-center">VIsit Reservation is Under Review</h1>
+            <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800 text-center">Visit Reservation is Under Review</h1>
             <p class="text-base md:text-lg mb-2 md:mb-4 text-gray-600 text-center">Please wait patiently for admin confirmation.</p>
         </div>
     </div>

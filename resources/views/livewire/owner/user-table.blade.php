@@ -68,11 +68,7 @@
                 <tr class="hover:bg-indigo-100 ">
                     <td class="py-3 px-4 text-center border-b border-gray-300">{{$user->name}}</td>
                     <td class="py-3 px-4 text-center border-b border-gray-300">{{$user->email}}</td>
-                    @if($user->role === 'reserve')
-                    <td class="py-3 px-4 text-center border-b border-gray-300">customer</td>
-                    @else
                     <td class="py-3 px-4 text-center border-b border-gray-300">{{$user->role}}</td>
-                    @endif
                     <td class="py-3 px-4 text-center border-b border-gray-300">{{$user->date}}</td>
                 </tr>
                 @endif

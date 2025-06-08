@@ -7,7 +7,7 @@
       <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
         <div class="flex flex-col">
           <div class="flex items-center gap-4 mb-4 p-2 bg-gray-50 rounded-lg shadow-sm">
-            <h1 class="text-2xl font-semibold text-black">Admin Dashboard</h1>
+            <h1 class="text-2xl font-semibold text-black">Staff Dashboard</h1>
           </div>
 
           <section class="text-gray-700 body-font">
