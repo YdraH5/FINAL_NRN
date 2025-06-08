@@ -231,15 +231,14 @@
                             <!-- Image Carousel -->
                             <div id="default-carousel-{{$category->category_id}}" class="relative" data-carousel="static">
                                 <div class="overflow-hidden relative h-64 md:h-72 lg:h-80">
-                                    @foreach ($images[$category->category_id] as $image)
-                                    <!-- Image Container with Fixed Aspect Ratio -->
-                                    <div class="w-full h-ful overflow-hidden flex items-center justify-center bg-gray-100">
-                                        @if($images[$category->category_id]->first())
-                                        <img src="{{ asset($images[$category->category_id]->first()->image) }}" 
-                                            class="object-contain h-full w-full p-2"
-                                            alt="{{ $category->category_name }}"
-                                            loading="lazy">
-                                        @endif
+                                    @foreach ($images[$category->category_id] as $index => $image)
+                                    <div class="w-full h-full absolute top-0 left-0" data-carousel-item style="display: none;">
+                                        <div class="w-full  flex items-center justify-center bg-gray-100">
+                                            <img src="{{ asset($image->image) }}" 
+                                                class="object-contain  w-full p-2"
+                                                alt="{{ $category->category_name }}"
+                                                loading="lazy">
+                                        </div>
                                     </div>
                                     @endforeach
                                 </div>
@@ -261,14 +260,14 @@
                                 <!-- Navigation Arrows -->
                                 @if($images[$category->category_id]->count() > 1)
                                 <button type="button" 
-                                        class="absolute top-1/2 left-4 z-30 flex items-center justify-center w-10 h-10 rounded-full bg-white/80 text-gray-800 shadow-md hover:bg-white transition-all opacity-0 group-hover:opacity-100 -translate-y-1/2" 
+                                        class="absolute top-1/2 left-4 z-30 flex items-center justify-center w-10 h-10 rounded-full bg-white/80 text-gray-800 shadow-md hover:bg-white transition-all opacity-0 group-hover:opacity-100 -translate-y-1/2 hover:scale-110" 
                                         data-carousel-prev>
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                                     </svg>
                                 </button>
                                 <button type="button" 
-                                        class="absolute top-1/2 right-4 z-30 flex items-center justify-center w-10 h-10 rounded-full bg-white/80 text-gray-800 shadow-md hover:bg-white transition-all opacity-0 group-hover:opacity-100 -translate-y-1/2" 
+                                        class="absolute top-1/2 right-4 z-30 flex items-center justify-center w-10 h-10 rounded-full bg-white/80 text-gray-800 shadow-md hover:bg-white transition-all opacity-0 group-hover:opacity-100 -translate-y-1/2 hover:scale-110" 
                                         data-carousel-next>
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -332,6 +331,66 @@
             </div>
         </section>
                 <script>
+                        // Initialize all apartment carousels
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all carousel containers
+        const carousels = document.querySelectorAll('[data-carousel="static"]');
+        
+        carousels.forEach(carousel => {
+            const slides = carousel.querySelectorAll('[data-carousel-item]');
+            const prevButton = carousel.querySelector('[data-carousel-prev]');
+            const nextButton = carousel.querySelector('[data-carousel-next]');
+            const indicators = carousel.querySelectorAll('[data-carousel-slide-to]');
+            
+            let currentIndex = 0;
+            
+            // Function to show current slide
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.style.display = i === index ? 'block' : 'none';
+                });
+                
+                // Update active indicator
+                indicators.forEach((indicator, i) => {
+                    if (i === index) {
+                        indicator.classList.add('bg-white');
+                        indicator.classList.remove('bg-white/50');
+                    } else {
+                        indicator.classList.remove('bg-white');
+                        indicator.classList.add('bg-white/50');
+                    }
+                });
+                
+                currentIndex = index;
+            }
+            
+            // Initialize first slide
+            showSlide(0);
+            
+            // Navigation handlers
+            if (prevButton) {
+                prevButton.addEventListener('click', () => {
+                    const newIndex = (currentIndex - 1 + slides.length) % slides.length;
+                    showSlide(newIndex);
+                });
+            }
+            
+            if (nextButton) {
+                nextButton.addEventListener('click', () => {
+                    const newIndex = (currentIndex + 1) % slides.length;
+                    showSlide(newIndex);
+                });
+            }
+            
+            // Indicator handlers
+            indicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', () => {
+                    showSlide(index);
+                });
+            });
+        });
+    });
+
                     let currentIndex = 0;
                     const carousel = document.getElementById('carousel');
                     const items = document.querySelectorAll('.carousel-item');
