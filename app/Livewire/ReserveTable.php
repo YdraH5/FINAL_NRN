@@ -26,7 +26,7 @@ class ReserveTable extends Component
     public $currentStatus;
     protected $listeners = ['showReceipt'];
     public $sortDirection = "ASC";
-    public $sortColumn = "user_name";
+    public $sortColumn = "created_at";
     public $perPage = 10;
     public $approved_id;
     public $rejected_id;

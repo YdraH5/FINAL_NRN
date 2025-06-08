@@ -50,19 +50,19 @@
             </div>
         </div>
     </div>
-        <div id="about-us" class="bg-white py-8 md:py-8 px-4 md:px-8 lg:px-16">
+        <div id="about-us" class="bg-white py-8 md:py-8 px-4 md:px-8 lg:px-16"data-aos="fade-up">
             <div class="max-w-full mx-auto">
                 <!-- Section Header -->
-                <div class="text-center mb-16">
-                    <h2 class="font-san-serif text-3xl md:text-4xl lg:text-5xl text-gray-900 mb-6 leading-tight">
+                <div class="text-center mb-4">
+                    <h2 class="font-san-serif text-3xl md:text-4xl lg:text-5xl text-gray-900 leading-tight">
                         About Us
                     </h2>
                     @isset($settings->discover_description)
-                    <p class="text-lg text-gray-800 max-w-6xl mx-auto mt-4">
+                    <p class="text-lg text-gray-800 max-w-6xl mx-auto">
                         {{ $settings->discover_description }}
                     </p>
                     @else
-                    <p class="text-lg text-gray-800 max-w-3xl mx-auto mt-4">
+                    <p class="text-lg text-gray-800 max-w-3xl mx-auto">
                         Experience refined living at NRN Building in Mission Hills, Roxas City - where comfort meets modern convenience.
                     </p>
                     @endisset
@@ -113,7 +113,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
-                                <span class="text-lg text-gray-800 max-w-6xl">24/7 security and CCTV monitoring</span>
+                                <span class="text-lg text-gray-800 max-w-6xl">Parking Space</span>
                             </li>
                             <li class="flex items-start">
                                 <div class="flex-shrink-0 mt-0.5">
@@ -121,7 +121,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
-                                <span class="text-lg text-gray-800 max-w-6xl">Free high-speed WiFi access</span>
+                                <span class="text-lg text-gray-800 max-w-6xl">Air Conditioned Room</span>
                             </li>
                             <li class="flex items-start">
                                 <div class="flex-shrink-0 mt-0.5">
@@ -138,7 +138,7 @@
         </div>
        <div id="nearby" class="scroll-mt-20"></div>
         <!-- Nearby Establishments Section -->
-        <section class="bg-gray-50 py-12 md:py-18 px-4 md:px-8" data-aos="fade-up">
+        <section class="bg-gray-50 py-4 md:py-18 px-4 md:px-8" data-aos="fade-up">
             <div class="max-w-full mx-auto">
                 <!-- Section Header -->
                 <div class="text-center mb-12 md:mb-16">
