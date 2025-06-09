@@ -19,6 +19,9 @@
             <button onclick="window.print()" class="no-print bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                 Print Report
             </button>
+            <button class="no-print" x-data x-on:click="$dispatch('open-modal',{name:'add-payment'})"title ="Add Payment"{{$open=true;}}>
+                @include('buttons.add')
+            </button> 
         </div>
         <!-- Print-Only Section -->
         <div class="print-only bg-white p-6 rounded-lg shadow-md mb-6">
